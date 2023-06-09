@@ -9,6 +9,7 @@ public class LaserInput : MonoBehaviour
     int currentID;
 
     private float range = 100.0f;
+    private float countdown = 2.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -33,16 +34,22 @@ public class LaserInput : MonoBehaviour
                 currentID = id;
                 currentObject = hit.collider.gameObject;
 
-                string name = currentObject.name;
+                if (currentObject.CompareTag("Target"))
+                {
+                    countdown -= Time.deltaTime;
+                    if (countdown < 0) Destroy(currentObject);
+                }
+
+                /*string name = currentObject.name;
                 if (name == "Next")
                 {
                     Debug.Log("HIT NEXT");
                 }
 
-                if (currentObject.CompareTag("Button"))
+                if (currentObject.CompareTag("Target"))
                 {
-                    Debug.Log("HIT BUTTON");
-                }
+                    Debug.Log("HIT TARGET");
+                }*/
             }
         }
     }
