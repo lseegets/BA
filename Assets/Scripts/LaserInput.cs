@@ -21,7 +21,26 @@ public class LaserInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        RaycastHit[] hits;
+      if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 100.0f))
+      {
+        if (hit.collider.gameObject.CompareTag("Target"))
+        {
+            countdown -= Time.deltaTime;
+            if (countdown < 0)
+            {
+                Destroy(hit.collider.gameObject);
+                resetCountdown();
+            }
+        }
+        else
+        {
+            resetCountdown();
+        }
+      }
+      
+
+
+       /* RaycastHit[] hits;
         hits = Physics.RaycastAll(transform.position, transform.forward, range);
 
         for (int i = 0; i < hits.Length; i++)
@@ -37,20 +56,23 @@ public class LaserInput : MonoBehaviour
                 if (currentObject.CompareTag("Target"))
                 {
                     countdown -= Time.deltaTime;
-                    if (countdown < 0) Destroy(currentObject);
+                    if (countdown < 0)
+                    {
+                        Destroy(currentObject);
+                        resetCountdown();
+                    }
                 }
-
-                /*string name = currentObject.name;
-                if (name == "Next")
+                else if (!currentObject.CompareTag("Target"))
                 {
-                    Debug.Log("HIT NEXT");
+                    //resetCountdown();
+                    Debug.Log("hitting canvas");
                 }
-
-                if (currentObject.CompareTag("Target"))
-                {
-                    Debug.Log("HIT TARGET");
-                }*/
             }
-        }
+        }*/
+    }
+
+    private void resetCountdown()
+    {
+        countdown = 2.0f;
     }
 }

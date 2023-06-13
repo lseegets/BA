@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Button
   - Target
+  - Canvas
   layers:
   - Default
   - TransparentFX
