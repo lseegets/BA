@@ -8,6 +8,9 @@ public class LaserInput : MonoBehaviour
     public static GameObject currentObject;
     int currentID;
 
+    public Material activatedMaterial;
+    public Material defaultMaterial;
+
     private float range = 100.0f;
     private float countdown = 2.0f;
 
@@ -25,16 +28,19 @@ public class LaserInput : MonoBehaviour
       {
         if (hit.collider.gameObject.CompareTag("Target"))
         {
+            currentObject = hit.collider.gameObject;
+            currentObject.GetComponent<MeshRenderer>().material = activatedMaterial;
             countdown -= Time.deltaTime;
             if (countdown < 0)
             {
-                Destroy(hit.collider.gameObject);
+                Destroy(currentObject);
                 resetCountdown();
             }
         }
         else
         {
             resetCountdown();
+            if (currentObject != null) currentObject.GetComponent<MeshRenderer>().material = defaultMaterial;
         }
       }
       
