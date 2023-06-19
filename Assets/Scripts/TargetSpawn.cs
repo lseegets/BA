@@ -36,37 +36,37 @@ public class TargetSpawn : MonoBehaviour
 
     private void SpawnFirstTarget()
     {
-        //OLD
+        /*OLD
          Vector3 targetCenter = new Vector3(Random.Range(-2.5f, 2.5f), Random.Range(0f, 5.0f), 5.0f);
-         currentTarget = Instantiate(target, targetCenter, Quaternion.identity);
+         currentTarget = Instantiate(target, targetCenter, Quaternion.identity);*/
 
-      /*  currentTarget = Instantiate(target);
+        currentTarget = Instantiate(target);
         Vector3 firstTargetVector;
         SphericalToCartesian(radiusPlayerDome, startElevation, startPolar, out firstTargetVector);
         currentTarget.transform.position = currentTarget.transform.position + firstTargetVector;
+        currentTargetPos = currentTarget.transform.position;
 
         cameraPos = transform.position;
         distanceToPlayer = Mathf.Abs(Vector3.Distance(currentTarget.transform.position, cameraPos));
-        distanceToPrevTarget = 0;*/
+        distanceToPrevTarget = 0;
     }
 
     private void SpawnNextTarget()
     {
-        //OLD
+        /*OLD
          Vector3 targetCenter = new Vector3(Random.Range(-2.5f, 2.5f), Random.Range(0f, 5.0f), 5.0f);
          currentTarget = Instantiate(target, targetCenter, Quaternion.identity);
-         currentTargetPos = currentTarget.transform.position;
+         currentTargetPos = currentTarget.transform.position;*/
 
-      /*  Vector3 targetCenter = ComputeTargetCenter();
+        Vector3 targetCenter = ComputeTargetCenter();
         currentTarget = Instantiate(target);
         currentTarget.transform.position = targetCenter;
         cameraPos = transform.position;
-        currentTargetPos = currentTarget.transform.position;*/
+        currentTargetPos = currentTarget.transform.position;
     }
 
     public Vector3 ComputeTargetCenter()
     {
-
         float distance = Mathf.Abs(Vector3.Distance(currentTargetPos, cameraPos));
 
         float scalingOnC1C2 = 0.5f + (radiusPlayerDome * radiusPlayerDome - radiusTargetSafeSpace * radiusTargetSafeSpace) / (2f * distance * distance); 
