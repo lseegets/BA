@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class TargetSpawn : MonoBehaviour
 {
+    public int maxTargets;
+
     [SerializeField] GameObject target;
 
     private GameObject currentTarget;
