@@ -4,20 +4,8 @@ using UnityEngine;
 
 public class TargetDestroyed : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private void OnDestroy()
     {
-        Debug.Log("DESTROYED!!!");
+        GameObject.Find("[CameraRig]/Camera").GetComponent<TargetSpawn>().OnTargetDestroyed();
     }
 }
