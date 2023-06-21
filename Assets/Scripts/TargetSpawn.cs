@@ -11,6 +11,8 @@ public class TargetSpawn : MonoBehaviour
     const float startPolar = 0.5f * Mathf.PI;
 
     public int maxTargetCount;
+    public int playerId;
+    public int playerTrial;
 
     [SerializeField] GameObject target;
     [SerializeField] Text timeDisplay;
@@ -23,6 +25,8 @@ public class TargetSpawn : MonoBehaviour
     private float timer = 0;
     private bool trackTimer = false;
 
+    private CSVWriter csvWriter;
+
     float distanceToPlayer;
     float distanceToPrevTarget;
 
@@ -30,13 +34,14 @@ public class TargetSpawn : MonoBehaviour
     void Start()
     {
         SpawnFirstTarget();
+        csvWriter = new CSVWriter(playerId);
     }
 
     // Update is called once per frame
     void Update()
     {
         if (trackTimer) UpdateTimer();
-        //Debug.Log(timer);
+        Debug.Log(timer);
 
         if ((currentTarget == null) && (currentTargetCount < maxTargetCount)) SpawnNextTarget();
 
@@ -95,7 +100,9 @@ public class TargetSpawn : MonoBehaviour
     {
         currentTargetCount++;
         timeDisplay.text += currentTargetCount.ToString() + ": " + timer.ToString() + ";\n";
+        PlayerData playerData = new PlayerData(playerId, playerTrial, timer);
         StopTimer();
+        csvWriter.WriteCSV(playerData);
     }
 
     private void SpawnFirstTarget()
