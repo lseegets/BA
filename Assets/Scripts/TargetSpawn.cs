@@ -22,8 +22,6 @@ public class TargetSpawn : MonoBehaviour
     private Vector3 cameraPos;
 
     private int currentTargetCount = 0;
-    private float timer = 0;
-    private bool trackTimer = false;
 
     private CSVWriter csvWriter;
 
@@ -40,8 +38,8 @@ public class TargetSpawn : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (trackTimer) UpdateTimer();
-        Debug.Log(timer);
+        if (Timer.keepTiming) Timer.UpdateTimer();
+        Debug.Log(Timer.timer);
 
         if ((currentTarget == null) && (currentTargetCount < maxTargetCount)) SpawnNextTarget();
 
@@ -99,18 +97,14 @@ public class TargetSpawn : MonoBehaviour
     public void OnTargetDestroyed()
     {
         currentTargetCount++;
-        timeDisplay.text += currentTargetCount.ToString() + ": " + timer.ToString() + ";\n";
-        PlayerData playerData = new PlayerData(playerId, playerTrial, timer);
-        StopTimer();
+        timeDisplay.text += currentTargetCount.ToString() + ": " + Timer.timer.ToString() + ";\n";
+        PlayerData playerData = new PlayerData(playerId, playerTrial, Timer.timer);
+        Timer.StopTimer();
         csvWriter.WriteCSV(playerData);
     }
 
     private void SpawnFirstTarget()
     {
-        /*OLD
-         Vector3 targetCenter = new Vector3(Random.Range(-2.5f, 2.5f), Random.Range(0f, 5.0f), 5.0f);
-         currentTarget = Instantiate(target, targetCenter, Quaternion.identity);*/
-
         currentTarget = Instantiate(target);
         Vector3 firstTargetVector;
         SphericalToCartesian(radiusPlayerDome, startElevation, startPolar, out firstTargetVector);
@@ -121,38 +115,17 @@ public class TargetSpawn : MonoBehaviour
         distanceToPlayer = Mathf.Abs(Vector3.Distance(currentTarget.transform.position, cameraPos));
         distanceToPrevTarget = 0;
 
-        StartTimer();
+        Timer.StartTimer();
     }
 
     private void SpawnNextTarget()
     {
-        /*OLD
-         Vector3 targetCenter = new Vector3(Random.Range(-2.5f, 2.5f), Random.Range(0f, 5.0f), 5.0f);
-         currentTarget = Instantiate(target, targetCenter, Quaternion.identity);
-         currentTargetPos = currentTarget.transform.position;*/
-
         Vector3 targetCenter = ComputeTargetCenter();
         currentTarget = Instantiate(target);
         currentTarget.transform.position = targetCenter;
         cameraPos = transform.position;
         currentTargetPos = currentTarget.transform.position;
 
-        StartTimer();
-    }
-
-    private void StartTimer()
-    {
-        trackTimer = true;
-    }
-
-    private void StopTimer()
-    {
-        trackTimer = false;
-        timer = 0;
-    }
-
-    private void UpdateTimer()
-    {
-        timer += Time.deltaTime;
+        Timer.StartTimer();
     }
 }
