@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
+using System;
 
 public class TargetSpawn : MonoBehaviour
 {
@@ -106,6 +108,8 @@ public class TargetSpawn : MonoBehaviour
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
         plotter.WriteCSV(tracker.trackingData);
+        Differentiate(tracker.trackingData);
+        Differentiate2(tracker.trackingData);
         tracker.trackingData.Clear();
         csvWriter.WriteCSV(playerData);
     }
@@ -134,5 +138,93 @@ public class TargetSpawn : MonoBehaviour
         currentTargetPos = currentTarget.transform.position;
 
         Timer.StartTimer();
+    }
+
+    private void Differentiate(List<KeyValuePair<float, float>> list)
+    {
+        int scale = 100;
+        List<KeyValuePair<float, float>> vList = new();
+
+        for (int i = 1; i < list.Count; i++)
+        {
+            float key;
+            float value;
+
+            key = list[i].Key;
+            value = (list[i].Value - list[i - 1].Value) / scale;
+
+            vList.Add(new KeyValuePair<float, float>(key, value));
+        }
+
+        string fileName = Application.dataPath + "/CSVFiles/VELOCITY" + playerId + "_"+ currentTargetCount + ".csv";
+        TextWriter writer = new StreamWriter(fileName, true);
+        writer.WriteLine("time;velocity");
+        foreach (var item in vList)
+        {
+            writer.WriteLine(item.Key + ";" + item.Value);
+        }
+        writer.Close();
+    }
+
+    private void Differentiate2(List<KeyValuePair<float, float>> list)
+    {
+        int scale = 100;
+        List<KeyValuePair<float, float>> vList = new();
+        List<KeyValuePair<float, float>> aList = new();
+
+        for (int i = 1; i < list.Count; i++)
+        {
+            float key;
+            float value;
+
+            key = list[i].Key;
+            value = (list[i].Value - list[i - 1].Value) / scale;
+
+            vList.Add(new KeyValuePair<float, float>(key, value));
+        }
+
+        for (int i = 1; i < vList.Count; i++)
+        {
+            float key;
+            float value;
+
+            key = vList[i].Key;
+            value = (vList[i].Value - vList[i - 1].Value) / scale;
+
+            aList.Add(new KeyValuePair<float, float>(key, value));
+        }
+
+        string fileName = Application.dataPath + "/CSVFiles/ACCELERATION" + playerId + "_" + currentTargetCount + ".csv";
+        TextWriter writer = new StreamWriter(fileName, true);
+        writer.WriteLine("time;acceleration");
+        foreach (var item in aList)
+        {
+            writer.WriteLine(item.Key + ";" + item.Value);
+        }
+        writer.Close();
+    }
+
+    private void DifferentiateTest()
+    {
+        List<KeyValuePair<float, float>> vList = new();
+
+        for (int i = 1; i < 100; i++)
+        {
+            float key;
+            float value;
+
+            key = i;
+            value = (float) (Math.Sin(i) - Math.Sin(i-1)) / 100;
+
+            vList.Add(new KeyValuePair<float, float>(key, value));
+        }
+        string fileName = Application.dataPath + "/CSVFiles/VELOCITYTEST" + currentTargetCount + ".csv";
+        TextWriter writer = new StreamWriter(fileName, true);
+        writer.WriteLine("time;velocity");
+        foreach (var item in vList)
+        {
+            writer.WriteLine(item.Key + ";" + item.Value);
+        }
+        writer.Close();
     }
 }
