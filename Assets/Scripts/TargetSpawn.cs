@@ -24,6 +24,8 @@ public class TargetSpawn : MonoBehaviour
     private int currentTargetCount = 0;
 
     private CSVWriter csvWriter;
+    private Plotter plotter;
+    private Tracker tracker;
 
     float distanceToPlayer;
     float distanceToPrevTarget;
@@ -33,13 +35,15 @@ public class TargetSpawn : MonoBehaviour
     {
         SpawnFirstTarget();
         csvWriter = new CSVWriter(playerId);
+        tracker = GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>();
     }
 
     // Update is called once per frame
     void Update()
     {
         if (Timer.keepTiming) Timer.UpdateTimer();
-        Debug.Log(Timer.timer);
+        //  Debug.Log(Timer.timer);
+       // Debug.Log(tracker.lastPos);
 
         if ((currentTarget == null) && (currentTargetCount < maxTargetCount)) SpawnNextTarget();
 
@@ -100,6 +104,9 @@ public class TargetSpawn : MonoBehaviour
         timeDisplay.text += currentTargetCount.ToString() + ": " + Timer.timer.ToString() + ";\n";
         PlayerData playerData = new PlayerData(playerId, playerTrial, Timer.timer);
         Timer.StopTimer();
+        plotter = new Plotter(playerId, currentTargetCount);
+        plotter.WriteCSV(tracker.trackingData);
+        tracker.trackingData.Clear();
         csvWriter.WriteCSV(playerData);
     }
 

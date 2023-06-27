@@ -18,12 +18,6 @@ public class CSVWriter : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
     public void WriteCSV(PlayerData playerData)
     {
         TextWriter writer = new StreamWriter(fileName, true);
