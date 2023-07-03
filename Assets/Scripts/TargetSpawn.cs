@@ -16,6 +16,10 @@ public class TargetSpawn : MonoBehaviour
     public int playerId;
     public int playerTrial;
 
+    private bool distancePositiveX;
+    private bool distancePositiveY;
+    private Vector3 previousTargetPos;
+
     [SerializeField] GameObject target;
     [SerializeField] Text timeDisplay;
 
@@ -44,12 +48,6 @@ public class TargetSpawn : MonoBehaviour
     void Update()
     {
         if (Timer.keepTiming) Timer.UpdateTimer();
-        //  Debug.Log(Timer.timer);
-       // Debug.Log(tracker.lastPos);
-
-        if ((currentTarget == null) && (currentTargetCount < maxTargetCount)) SpawnNextTarget();
-
-       // else if (currentTargetCount == maxTargetCount) timeDisplay.text = currentTargetCount.ToString();
     }
 
     public Vector3 ComputeTargetCenter()
@@ -107,11 +105,42 @@ public class TargetSpawn : MonoBehaviour
         PlayerData playerData = new PlayerData(playerId, playerTrial, Timer.timer);
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
-        plotter.WriteCSV(tracker.trackingData);
+        plotter.WriteCSV(tracker.trackingData, tracker.controllerPos, tracker.cameraPos, previousTargetPos, currentTargetPos);
         Differentiate(tracker.trackingData);
         Differentiate2(tracker.trackingData);
         tracker.trackingData.Clear();
+        tracker.totalDistance = 0;
         csvWriter.WriteCSV(playerData);
+        SendPositionData();
+        previousTargetPos = currentTargetPos;
+
+        if (currentTargetCount < maxTargetCount) SpawnNextTarget();
+        // else if (currentTargetCount == maxTargetCount) timeDisplay.text = currentTargetCount.ToString();
+    }
+
+    public void SendPositionData()
+    {
+
+       // Debug.Log("XPREV: " + previousTargetPos.x + "     XCURR: " + currentTargetPos.x);
+       // Debug.Log("YPREV: " + previousTargetPos.y + "     YCURR: " + currentTargetPos.y);
+
+        if (currentTargetPos.x >= previousTargetPos.x)
+        {
+            distancePositiveX = true;
+        } else if (currentTargetPos.x < previousTargetPos.x)
+        {
+            distancePositiveX = false;
+        }
+
+        if (currentTargetPos.y >= previousTargetPos.y)
+        {
+            distancePositiveY = true;
+        }
+        else if (currentTargetPos.y < previousTargetPos.y)
+        {
+            distancePositiveY = false;
+        }
+        GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>().HandlePositionData(distancePositiveX, distancePositiveY);
     }
 
     private void SpawnFirstTarget()
@@ -121,6 +150,7 @@ public class TargetSpawn : MonoBehaviour
         SphericalToCartesian(radiusPlayerDome, startElevation, startPolar, out firstTargetVector);
         currentTarget.transform.position = currentTarget.transform.position + firstTargetVector;
         currentTargetPos = currentTarget.transform.position;
+        previousTargetPos = currentTargetPos;
 
         cameraPos = transform.position;
         distanceToPlayer = Mathf.Abs(Vector3.Distance(currentTarget.transform.position, cameraPos));
