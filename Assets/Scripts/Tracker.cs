@@ -106,6 +106,7 @@ public class Tracker : MonoBehaviour
             }
         }
 
+        // keep a look out for this
         if (!goingForwardX && !goingForwardY)
         {
             goingForward = false;
@@ -116,7 +117,7 @@ public class Tracker : MonoBehaviour
         }
     }
 
-    private float CalculateDistance(Vector3 currentPosition, Vector3 lastPosition)
+    private void CalculateDistance(Vector3 currentPosition, Vector3 lastPosition)
     {
         float distance = (currentPosition - lastPosition).magnitude;
 
@@ -141,6 +142,5 @@ public class Tracker : MonoBehaviour
         trackingData.Add(new KeyValuePair<float, float>(Timer.timer, totalDistance));
         controllerPos.Add(currentPos);
         cameraPos.Add(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position);
-        return distance;
     }
 }
