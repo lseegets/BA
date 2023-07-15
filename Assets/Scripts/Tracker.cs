@@ -11,7 +11,6 @@ public class Tracker : MonoBehaviour
     public Vector3 lastPos;
     public float totalDistance = 0;
 
-    private bool moving;
     private Vector3 currentPos;
 
     private bool distancePositiveX;
@@ -29,6 +28,8 @@ public class Tracker : MonoBehaviour
     void FixedUpdate()
     {
         TrackMovement();
+        
+        Debug.Log("current X: " + distancePositiveX + "             current Y: " + distancePositiveY);
     }
 
     public void TrackMovement()
@@ -39,10 +40,7 @@ public class Tracker : MonoBehaviour
         {
             CalculateDistance(currentPos, lastPos);
         }
-        else if (lastPos == currentPos)
-        {
-            moving = false;
-        }
+
         lastPos = currentPos;
     }
 
@@ -50,11 +48,9 @@ public class Tracker : MonoBehaviour
     {
         distancePositiveX = distanceX;
         distancePositiveY = distanceY;
-
-       // Debug.Log("X: " + distancePositiveX);
-       // Debug.Log("Y: " + distancePositiveY);
     }
 
+    // Problem liegt hier irgendwo bzw. mal den Debug in FixedUpdate prüfen
     private void CheckPosition()
     {
         bool goingForwardX = true;

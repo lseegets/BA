@@ -120,10 +120,6 @@ public class TargetSpawn : MonoBehaviour
 
     public void SendPositionData()
     {
-
-       // Debug.Log("XPREV: " + previousTargetPos.x + "     XCURR: " + currentTargetPos.x);
-       // Debug.Log("YPREV: " + previousTargetPos.y + "     YCURR: " + currentTargetPos.y);
-
         if (currentTargetPos.x >= previousTargetPos.x)
         {
             distancePositiveX = true;
@@ -140,6 +136,7 @@ public class TargetSpawn : MonoBehaviour
         {
             distancePositiveY = false;
         }
+
         GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>().HandlePositionData(distancePositiveX, distancePositiveY);
     }
 
