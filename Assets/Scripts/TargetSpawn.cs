@@ -137,7 +137,8 @@ public class TargetSpawn : MonoBehaviour
             distancePositiveY = false;
         }
 
-        GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>().HandlePositionData(distancePositiveX, distancePositiveY);
+      //  GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>().HandlePositionData(distancePositiveX, distancePositiveY);
+        GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>().HandlePositionData(currentTargetPos, previousTargetPos);
     }
 
     private void SpawnFirstTarget()

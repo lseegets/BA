@@ -17,6 +17,9 @@ public class Tracker : MonoBehaviour
     private bool distancePositiveY;
     private bool goingForward;
 
+    private Vector3 currentTargetPos;
+    private Vector3 previousTargetPos;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,14 +31,13 @@ public class Tracker : MonoBehaviour
     void FixedUpdate()
     {
         TrackMovement();
-        
-        Debug.Log("current X: " + distancePositiveX + "             current Y: " + distancePositiveY);
     }
 
     public void TrackMovement()
     {
         currentPos = transform.position;
-        CheckPosition();
+        CheckDistanceToPrevTarget();
+        //CheckPosition();
         if (lastPos != currentPos)
         {
             CalculateDistance(currentPos, lastPos);
@@ -44,13 +46,31 @@ public class Tracker : MonoBehaviour
         lastPos = currentPos;
     }
 
-    public void HandlePositionData(bool distanceX, bool distanceY)
+    //public void HandlePositionData(bool distanceX, bool distanceY)
+    public void HandlePositionData(Vector3 currentTarget, Vector3 previousTarget)
     {
-        distancePositiveX = distanceX;
-        distancePositiveY = distanceY;
+        //distancePositiveX = distanceX;
+        //distancePositiveY = distanceY;
+        currentTargetPos = currentTarget;
+        previousTargetPos = previousTarget;
     }
 
-    // Problem liegt hier irgendwo bzw. mal den Debug in FixedUpdate prüfen
+    private void CheckDistanceToPrevTarget()
+    {
+        float prevDistance = Vector3.Distance(previousTargetPos, lastPos);
+        float currentDistance = Vector3.Distance(previousTargetPos, currentPos);
+
+        if (prevDistance < currentDistance)
+        {
+            goingForward = true;
+        }
+        else if (prevDistance > currentDistance)
+        {
+            goingForward = false;
+        }
+    }
+
+    // Problem liegt hier irgendwo bzw. mal den Debug in FixedUpdate prï¿½fen
     private void CheckPosition()
     {
         bool goingForwardX = true;
