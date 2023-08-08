@@ -32,6 +32,7 @@ public class TargetSpawn : MonoBehaviour
     private CSVWriter csvWriter;
     private Plotter plotter;
     private Tracker tracker;
+    private GameObject weight;
 
     float distanceToPlayer;
     float distanceToPrevTarget;
@@ -41,7 +42,9 @@ public class TargetSpawn : MonoBehaviour
     {
         SpawnFirstTarget();
         csvWriter = new CSVWriter(playerId);
-        tracker = GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>();
+        weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
+        tracker = weight.transform.Find("TrackPoint").GetComponent<Tracker>();
+        //tracker = GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>();
     }
 
     // Update is called once per frame
@@ -137,8 +140,9 @@ public class TargetSpawn : MonoBehaviour
             distancePositiveY = false;
         }
 
+        tracker.HandlePositionData(currentTargetPos, previousTargetPos);
       //  GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>().HandlePositionData(distancePositiveX, distancePositiveY);
-        GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>().HandlePositionData(currentTargetPos, previousTargetPos);
+      //  GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>().HandlePositionData(currentTargetPos, previousTargetPos);
     }
 
     private void SpawnFirstTarget()
