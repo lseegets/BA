@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WeightManager : MonoBehaviour
 {
-
+    
     public enum WeightLevel
     {
         light, 
@@ -15,24 +15,67 @@ public class WeightManager : MonoBehaviour
 
     public WeightLevel level = new WeightLevel();
 
+    // private List<GameObject> weightList = new List<GameObject>();
+    private GameObject weightLight, weightMediumLight, weightMediumHeavy, weightHeavy;
+
     public void Start()
     {
+        /* weightList.Add(weightLight);
+         weightList.Add(weightMediumLight);
+         weightList.Add(weightMediumHeavy);
+         weightList.Add(weightHeavy);*/
+        weightLight = GameObject.Find("ContainerPlastic");
+        weightMediumLight = GameObject.Find("Container1Weight");
+        weightMediumHeavy = GameObject.Find("Container4Weight");
+        weightHeavy = GameObject.Find("Container5Weight");
+
+        GameObject[] weightList = { weightLight, weightMediumLight, weightMediumHeavy, weightHeavy };
+
         switch (level)
         {
             case WeightLevel.light:
-                GameObject.Find("ContainerPlastic").tag = "Dumbbell";
+                weightLight.tag = "Dumbbell";
+                weightLight.SetActive(true);
+                foreach (GameObject weight in weightList)
+                {
+                    if (weight != weightLight) weight.SetActive(false);
+                }
                 break;
+
             case WeightLevel.mediumLight:
-                GameObject.Find("Container1Weight").tag = "Dumbbell";
+                weightMediumLight.tag = "Dumbbell";
+                weightMediumLight.SetActive(true);
+                foreach (GameObject weight in weightList)
+                {
+                    if (weight != weightMediumLight) weight.SetActive(false);
+                }
                 break;
+
             case WeightLevel.mediumHeavy:
-                GameObject.Find("Container4Weight").tag = "Dumbbell";
+                weightMediumHeavy.tag = "Dumbbell";
+                weightMediumHeavy.SetActive(true);
+                foreach (GameObject weight in weightList)
+                {
+                    if (weight != weightMediumHeavy) weight.SetActive(false);
+                }
                 break;
+
             case WeightLevel.heavy:
-                GameObject.Find("Container5Weight").tag = "Dumbbell";
+                weightHeavy.tag = "Dumbbell";
+                weightHeavy.SetActive(true);
+                foreach (GameObject weight in weightList)
+                {
+                    if (weight != weightHeavy) weight.SetActive(false);
+                }
                 break;
+
             default:
-                GameObject.Find("ContainerPlastic").tag = "Dumbbell";
+                weightLight.tag = "Dumbbell";
+                weightLight.SetActive(true);
+                foreach (GameObject weight in weightList)
+                {
+                    if (weight != weightLight) weight.SetActive(false);
+                }
                 break;
         }
     }

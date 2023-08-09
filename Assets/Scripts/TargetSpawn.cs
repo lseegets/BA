@@ -42,15 +42,16 @@ public class TargetSpawn : MonoBehaviour
     {
         SpawnFirstTarget();
         csvWriter = new CSVWriter(playerId);
-        weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
-        tracker = weight.transform.Find("TrackPoint").GetComponent<Tracker>();
-        //tracker = GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>();
+        //weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
+        //tracker = weight.transform.Find("TrackPoint").GetComponent<Tracker>();
     }
 
     // Update is called once per frame
     void Update()
     {
         if (Timer.keepTiming) Timer.UpdateTimer();
+        if (weight == null) weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
+        if (tracker == null) tracker = weight.transform.Find("TrackPoint").GetComponent<Tracker>();
     }
 
     public Vector3 ComputeTargetCenter()

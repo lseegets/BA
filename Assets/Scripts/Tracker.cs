@@ -17,6 +17,8 @@ public class Tracker : MonoBehaviour
     private bool distancePositiveY;
     private bool goingForward;
 
+    private float time;
+
     private Vector3 currentTargetPos;
     private Vector3 previousTargetPos;
 
@@ -36,12 +38,25 @@ public class Tracker : MonoBehaviour
     public void TrackMovement()
     {
         currentPos = transform.position;
-        CheckDistanceToPrevTarget();
-        //CheckPosition();
-        if (lastPos != currentPos)
+
+        if (currentPos != lastPos)
         {
+           // Debug.Log("prev: " + lastPos);
+            Debug.Log("current: " + currentPos);
+            CheckDistanceToPrevTarget();
             CalculateDistance(currentPos, lastPos);
         }
+        /*else if (time > 2f) time = 0;
+        else if (time < 2f)
+        {
+            time += Time.deltaTime;
+        }*/
+
+        //CheckPosition();
+        /*if (lastPos != currentPos)
+        {
+            CalculateDistance(currentPos, lastPos);
+        }*/
 
         lastPos = currentPos;
     }
@@ -57,10 +72,14 @@ public class Tracker : MonoBehaviour
 
     private void CheckDistanceToPrevTarget()
     {
-        float prevDistance = Vector3.Distance(previousTargetPos, lastPos);
-        float currentDistance = Vector3.Distance(previousTargetPos, currentPos);
+        Vector2 prevTarget = previousTargetPos;
+        Vector2 lastPos2 = lastPos;
+        Vector2 currentPos2 = currentPos;
 
-        if (prevDistance < currentDistance)
+        float prevDistance = Vector2.Distance(prevTarget, lastPos2);
+        float currentDistance = Vector2.Distance(prevTarget, currentPos2);
+
+        if (prevDistance <= currentDistance)
         {
             goingForward = true;
         }
@@ -68,6 +87,8 @@ public class Tracker : MonoBehaviour
         {
             goingForward = false;
         }
+
+        //Debug.Log("GoingForward: " + goingForward + "                distance: " + (currentDistance - prevDistance));
     }
 
     // Problem liegt hier irgendwo bzw. mal den Debug in FixedUpdate pr�fen
