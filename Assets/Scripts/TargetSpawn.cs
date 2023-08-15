@@ -32,6 +32,7 @@ public class TargetSpawn : MonoBehaviour
     private CSVWriter csvWriter;
     private Plotter plotter;
     private Tracker tracker;
+    private ViveTracker viveTracker;
     private GameObject weight;
 
     float distanceToPlayer;
@@ -52,6 +53,7 @@ public class TargetSpawn : MonoBehaviour
         if (Timer.keepTiming) Timer.UpdateTimer();
         if (weight == null) weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
         if (tracker == null) tracker = weight.transform.Find("TrackPoint").GetComponent<Tracker>();
+        if (viveTracker == null) viveTracker = GameObject.Find("CameraRig.ViveTracker").GetComponent<ViveTracker>();
     }
 
     public Vector3 ComputeTargetCenter()
@@ -144,8 +146,6 @@ public class TargetSpawn : MonoBehaviour
         }
 
         tracker.HandlePositionData(currentTargetPos, previousTargetPos);
-      //  GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>().HandlePositionData(distancePositiveX, distancePositiveY);
-      //  GameObject.FindGameObjectsWithTag("Dumbbell")[0].transform.Find("TrackPoint").GetComponent<Tracker>().HandlePositionData(currentTargetPos, previousTargetPos);
     }
 
     private void SpawnFirstTarget()
