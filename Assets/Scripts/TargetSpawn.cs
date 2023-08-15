@@ -105,7 +105,7 @@ public class TargetSpawn : MonoBehaviour
     public void OnTargetDestroyed()
     {
         currentTargetCount++;
-        timeDisplay.text += currentTargetCount.ToString() + ": " + Timer.timer.ToString() + ";\n";
+        //timeDisplay.text += currentTargetCount.ToString() + ": " + Timer.timer.ToString() + ";\n";
         PlayerData playerData = new PlayerData(playerId, playerTrial, Timer.timer);
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
@@ -113,13 +113,15 @@ public class TargetSpawn : MonoBehaviour
         Differentiate(tracker.trackingData);
         Differentiate2(tracker.trackingData);
         tracker.trackingData.Clear();
+        tracker.controllerPos.Clear();
+        tracker.cameraPos.Clear();
         tracker.totalDistance = 0;
         csvWriter.WriteCSV(playerData);
         SendPositionData();
         previousTargetPos = currentTargetPos;
 
         if (currentTargetCount < maxTargetCount) SpawnNextTarget();
-        // else if (currentTargetCount == maxTargetCount) timeDisplay.text = currentTargetCount.ToString();
+         else if (currentTargetCount == maxTargetCount) timeDisplay.text = "DONE";
     }
 
     public void SendPositionData()

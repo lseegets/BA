@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class WeightManager : MonoBehaviour
 {
-    
     public enum WeightLevel
     {
         light, 
@@ -15,19 +14,18 @@ public class WeightManager : MonoBehaviour
 
     public WeightLevel level = new WeightLevel();
 
-    // private List<GameObject> weightList = new List<GameObject>();
     private GameObject weightLight, weightMediumLight, weightMediumHeavy, weightHeavy;
 
     public void Start()
     {
-        /* weightList.Add(weightLight);
-         weightList.Add(weightMediumLight);
-         weightList.Add(weightMediumHeavy);
-         weightList.Add(weightHeavy);*/
-        weightLight = GameObject.Find("ContainerPlastic");
-        weightMediumLight = GameObject.Find("Container1Weight");
-        weightMediumHeavy = GameObject.Find("Container4Weight");
-        weightHeavy = GameObject.Find("Container5Weight");
+       // weightLight = GameObject.Find("ContainerPlastic");
+        weightLight = GameObject.Find("ContainerLight");
+       // weightMediumLight = GameObject.Find("Container1Weight");
+        weightMediumLight = GameObject.Find("ContainerMedium");
+        //weightMediumHeavy = GameObject.Find("Container4Weight");
+        weightMediumHeavy = GameObject.Find("ContainerMedium2");
+        //weightHeavy = GameObject.Find("Container5Weight");
+        weightHeavy = GameObject.Find("ContainerVeryHeavy");
 
         GameObject[] weightList = { weightLight, weightMediumLight, weightMediumHeavy, weightHeavy };
 

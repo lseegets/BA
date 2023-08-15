@@ -19,6 +19,8 @@ public class Tracker : MonoBehaviour
 
     private float time;
 
+    private float prevDistance;
+
     private Vector3 currentTargetPos;
     private Vector3 previousTargetPos;
 
@@ -27,6 +29,10 @@ public class Tracker : MonoBehaviour
     {
         lastPos = transform.position;
         totalDistance = 0;
+
+        Vector2 prevTarget = previousTargetPos;
+        Vector2 lastPos2 = lastPos;
+        prevDistance = Vector2.Distance(prevTarget, lastPos2);
     }
 
     // Update is called once per frame
@@ -39,13 +45,13 @@ public class Tracker : MonoBehaviour
     {
         currentPos = transform.position;
 
-        if (currentPos != lastPos)
-        {
+       // if (currentPos != lastPos)
+       // {
            // Debug.Log("prev: " + lastPos);
-            Debug.Log("current: " + currentPos);
+           // Debug.Log("current: " + currentPos);
             CheckDistanceToPrevTarget();
             CalculateDistance(currentPos, lastPos);
-        }
+       // }
         /*else if (time > 2f) time = 0;
         else if (time < 2f)
         {
@@ -73,10 +79,10 @@ public class Tracker : MonoBehaviour
     private void CheckDistanceToPrevTarget()
     {
         Vector2 prevTarget = previousTargetPos;
-        Vector2 lastPos2 = lastPos;
+        //Vector2 lastPos2 = lastPos;
         Vector2 currentPos2 = currentPos;
 
-        float prevDistance = Vector2.Distance(prevTarget, lastPos2);
+       // float prevDistance = Vector2.Distance(prevTarget, lastPos2);
         float currentDistance = Vector2.Distance(prevTarget, currentPos2);
 
         if (prevDistance <= currentDistance)
@@ -87,6 +93,8 @@ public class Tracker : MonoBehaviour
         {
             goingForward = false;
         }
+
+        prevDistance = currentDistance;
 
         //Debug.Log("GoingForward: " + goingForward + "                distance: " + (currentDistance - prevDistance));
     }
@@ -156,7 +164,11 @@ public class Tracker : MonoBehaviour
 
     private void CalculateDistance(Vector3 currentPosition, Vector3 lastPosition)
     {
-        float distance = (currentPosition - lastPosition).magnitude;
+        //float distance = (currentPosition - lastPosition).magnitude;
+
+        Vector2 currentPos2 = currentPos;
+        Vector2 lastPos2 = lastPos;
+        float distance = (currentPos2 - lastPos2).magnitude;
 
         float speed = (currentPos - lastPos).magnitude / Time.deltaTime;
 
