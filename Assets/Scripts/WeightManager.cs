@@ -6,7 +6,7 @@ public class WeightManager : MonoBehaviour
 {
     public enum WeightLevel
     {
-        light, 
+        light,
         mediumLight,
         mediumHeavy,
         heavy
@@ -20,6 +20,8 @@ public class WeightManager : MonoBehaviour
     {
        // weightLight = GameObject.Find("ContainerPlastic");
         weightLight = GameObject.Find("ContainerLight");
+        //weightLight = GameObject.Find("ContainerBamboo");
+       // weightLight = GameObject.Find("ContainerWoodenPole");
        // weightMediumLight = GameObject.Find("Container1Weight");
         weightMediumLight = GameObject.Find("ContainerMedium");
         //weightMediumHeavy = GameObject.Find("Container4Weight");

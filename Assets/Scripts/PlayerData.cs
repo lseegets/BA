@@ -5,13 +5,13 @@ using UnityEngine;
 public class PlayerData : MonoBehaviour
 {
     public int id;
-    public int trial;
+    public string level;
     public float time;
 
-    public PlayerData(int playerId, int playerTrial, float playerTime)
+    public PlayerData(int playerId, string weightLevel, float playerTime)
     {
         id = playerId;
-        trial = playerTrial;
+        level = weightLevel;
         time = playerTime;
     }
 }

@@ -14,20 +14,21 @@ public class TargetSpawn : MonoBehaviour
 
     public int maxTargetCount;
     public int playerId;
-    public int playerTrial;
+    public string weightLevel;
 
     private bool distancePositiveX;
     private bool distancePositiveY;
     private Vector3 previousTargetPos;
 
     [SerializeField] GameObject target;
-    [SerializeField] Text timeDisplay;
+    [SerializeField] Text display;
 
     private GameObject currentTarget;
     private Vector3 currentTargetPos;
     private Vector3 cameraPos;
 
     private int currentTargetCount = 0;
+    private float totalTime = 0;
 
     private CSVWriter csvWriter;
     private Plotter plotter;
@@ -52,8 +53,9 @@ public class TargetSpawn : MonoBehaviour
     {
         if (Timer.keepTiming) Timer.UpdateTimer();
         if (weight == null) weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
-        if (tracker == null) tracker = weight.transform.Find("TrackPoint").GetComponent<Tracker>();
-        if (viveTracker == null) viveTracker = GameObject.Find("CameraRig.ViveTracker").GetComponent<ViveTracker>();
+        //if (tracker == null) tracker = weight.transform.Find("TrackPoint").GetComponent<Tracker>();
+        // if (viveTracker == null) viveTracker = GameObject.Find("CameraRig.ViveTracker").GetComponent<ViveTracker>();
+        if (viveTracker == null) viveTracker = transform.parent.Find("ViveTracker").GetComponent<ViveTracker>();
     }
 
     public Vector3 ComputeTargetCenter()
@@ -108,22 +110,30 @@ public class TargetSpawn : MonoBehaviour
     {
         currentTargetCount++;
         //timeDisplay.text += currentTargetCount.ToString() + ": " + Timer.timer.ToString() + ";\n";
-        PlayerData playerData = new PlayerData(playerId, playerTrial, Timer.timer);
+        PlayerData playerData = new PlayerData(playerId, weightLevel, Timer.timer);
+        totalTime += Timer.timer;
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
-        plotter.WriteCSV(tracker.trackingData, tracker.controllerPos, tracker.cameraPos, previousTargetPos, currentTargetPos);
-        Differentiate(tracker.trackingData);
-        Differentiate2(tracker.trackingData);
-        tracker.trackingData.Clear();
+       // plotter.WriteCSV(tracker.trackingData, tracker.controllerPos, tracker.cameraPos, previousTargetPos, currentTargetPos);
+        plotter.WriteCSV(viveTracker.trackingData, viveTracker.controllerPos, viveTracker.cameraPos, previousTargetPos, currentTargetPos);
+       // Differentiate(tracker.trackingData);
+       // Differentiate2(tracker.trackingData);
+        Differentiate(viveTracker.trackingData);
+        Differentiate2(viveTracker.trackingData);
+       /* tracker.trackingData.Clear();
         tracker.controllerPos.Clear();
         tracker.cameraPos.Clear();
-        tracker.totalDistance = 0;
+        tracker.totalDistance = 0;*/
+        viveTracker.trackingData.Clear();
+        viveTracker.controllerPos.Clear();
+        viveTracker.cameraPos.Clear();
+        viveTracker.totalDistance = 0;
         csvWriter.WriteCSV(playerData);
         SendPositionData();
         previousTargetPos = currentTargetPos;
 
         if (currentTargetCount < maxTargetCount) SpawnNextTarget();
-         else if (currentTargetCount == maxTargetCount) timeDisplay.text = "DONE";
+        else if (currentTargetCount == maxTargetCount) display.text = "DONE \n" + "Total Time: " + totalTime.ToString("n2") + " seconds";
     }
 
     public void SendPositionData()
@@ -145,7 +155,8 @@ public class TargetSpawn : MonoBehaviour
             distancePositiveY = false;
         }
 
-        tracker.HandlePositionData(currentTargetPos, previousTargetPos);
+        //tracker.HandlePositionData(currentTargetPos, previousTargetPos);
+        viveTracker.HandlePositionData(currentTargetPos, previousTargetPos);
     }
 
     private void SpawnFirstTarget()
