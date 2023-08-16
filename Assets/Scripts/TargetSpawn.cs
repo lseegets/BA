@@ -16,8 +16,6 @@ public class TargetSpawn : MonoBehaviour
     public int playerId;
     public string weightLevel;
 
-    private bool distancePositiveX;
-    private bool distancePositiveY;
     private Vector3 previousTargetPos;
 
     [SerializeField] GameObject target;
@@ -27,7 +25,10 @@ public class TargetSpawn : MonoBehaviour
     private Vector3 currentTargetPos;
     private Vector3 cameraPos;
 
-    private int currentTargetCount = 0;
+    // !!!
+    public int currentTargetCount = 0;
+    // !!!
+
     private float totalTime = 0;
 
     private CSVWriter csvWriter;
@@ -109,21 +110,13 @@ public class TargetSpawn : MonoBehaviour
     public void OnTargetDestroyed()
     {
         currentTargetCount++;
-        //timeDisplay.text += currentTargetCount.ToString() + ": " + Timer.timer.ToString() + ";\n";
         PlayerData playerData = new PlayerData(playerId, weightLevel, Timer.timer);
         totalTime += Timer.timer;
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
-       // plotter.WriteCSV(tracker.trackingData, tracker.controllerPos, tracker.cameraPos, previousTargetPos, currentTargetPos);
-        plotter.WriteCSV(viveTracker.trackingData, viveTracker.controllerPos, viveTracker.cameraPos, previousTargetPos, currentTargetPos);
-       // Differentiate(tracker.trackingData);
-       // Differentiate2(tracker.trackingData);
+        plotter.WriteCSV(viveTracker.trackingData, viveTracker.controllerPos, viveTracker.cameraPos, previousTargetPos.ToString("F4"), currentTargetPos.ToString("F4"));
         Differentiate(viveTracker.trackingData);
         Differentiate2(viveTracker.trackingData);
-       /* tracker.trackingData.Clear();
-        tracker.controllerPos.Clear();
-        tracker.cameraPos.Clear();
-        tracker.totalDistance = 0;*/
         viveTracker.trackingData.Clear();
         viveTracker.controllerPos.Clear();
         viveTracker.cameraPos.Clear();
@@ -138,24 +131,6 @@ public class TargetSpawn : MonoBehaviour
 
     public void SendPositionData()
     {
-        if (currentTargetPos.x >= previousTargetPos.x)
-        {
-            distancePositiveX = true;
-        } else if (currentTargetPos.x < previousTargetPos.x)
-        {
-            distancePositiveX = false;
-        }
-
-        if (currentTargetPos.y >= previousTargetPos.y)
-        {
-            distancePositiveY = true;
-        }
-        else if (currentTargetPos.y < previousTargetPos.y)
-        {
-            distancePositiveY = false;
-        }
-
-        //tracker.HandlePositionData(currentTargetPos, previousTargetPos);
         viveTracker.HandlePositionData(currentTargetPos, previousTargetPos);
     }
 

@@ -16,12 +16,14 @@ public class ViveTracker : MonoBehaviour
 
     private bool goingForward;
 
-    private float time;
-
     private float prevDistance;
+
+    private float distanceToPrevTarget;
 
     private Vector3 currentTargetPos;
     private Vector3 previousTargetPos;
+
+    private int currentTargetCount;
 
     // Start is called before the first frame update
     void Start()
@@ -30,9 +32,9 @@ public class ViveTracker : MonoBehaviour
 
         totalDistance = 0;
 
-        Vector2 prevTarget = previousTargetPos;
-        Vector2 lastPos2 = lastPos;
-        prevDistance = Vector2.Distance(prevTarget, lastPos2);
+        prevDistance = Vector3.Distance(previousTargetPos, lastPos);
+
+        currentTargetCount = transform.parent.Find("Camera").GetComponent<TargetSpawn>().currentTargetCount;
     }
 
     // Update is called once per frame
@@ -45,45 +47,22 @@ public class ViveTracker : MonoBehaviour
     {
         currentPos = transform.position;
 
-        // if (currentPos != lastPos)
-        // {
-        // Debug.Log("prev: " + lastPos);
-        // Debug.Log("current: " + currentPos);
         CheckDistanceToPrevTarget();
-        CalculateDistance(currentPos, lastPos);
-        // }
-        /*else if (time > 2f) time = 0;
-        else if (time < 2f)
-        {
-            time += Time.deltaTime;
-        }*/
-
-        //CheckPosition();
-        /*if (lastPos != currentPos)
-        {
-            CalculateDistance(currentPos, lastPos);
-        }*/
-
+        CalculateDistance();
+        
         lastPos = currentPos;
     }
 
-    //public void HandlePositionData(bool distanceX, bool distanceY)
     public void HandlePositionData(Vector3 currentTarget, Vector3 previousTarget)
     {
-        //distancePositiveX = distanceX;
-        //distancePositiveY = distanceY;
         currentTargetPos = currentTarget;
         previousTargetPos = previousTarget;
     }
 
+    // distances printen & vergleichen
     private void CheckDistanceToPrevTarget()
     {
-        Vector2 prevTarget = previousTargetPos;
-        //Vector2 lastPos2 = lastPos;
-        Vector2 currentPos2 = currentPos;
-
-        // float prevDistance = Vector2.Distance(prevTarget, lastPos2);
-        float currentDistance = Vector2.Distance(prevTarget, currentPos2);
+        float currentDistance = Vector3.Distance(previousTargetPos, currentPos);
 
         if (prevDistance <= currentDistance)
         {
@@ -95,19 +74,13 @@ public class ViveTracker : MonoBehaviour
         }
 
         prevDistance = currentDistance;
-
-        //Debug.Log("GoingForward: " + goingForward + "                distance: " + (currentDistance - prevDistance));
     }
 
-    private void CalculateDistance(Vector3 currentPosition, Vector3 lastPosition)
+    private void CalculateDistance()
     {
-        //float distance = (currentPosition - lastPosition).magnitude;
+        float distance = (currentPos - lastPos).magnitude;
 
-        Vector2 currentPos2 = currentPos;
-        Vector2 lastPos2 = lastPos;
-        float distance = (currentPos2 - lastPos2).magnitude;
-
-        float speed = (currentPos - lastPos).magnitude / Time.deltaTime;
+      //  distanceToPrevTarget = (currentPos - previousTargetPos).magnitude;
 
         if (goingForward)
         {
@@ -118,14 +91,7 @@ public class ViveTracker : MonoBehaviour
             totalDistance -= distance;
         }
 
-        /* if (!goingForward)
-         {
-             speed -= 2 * speed;
-         }*/
-
-        // totalDistance += distance;
-
-        trackingData.Add(new KeyValuePair<float, float>(Timer.timer, totalDistance));
+        trackingData.Add(new KeyValuePair<float, float>(Timer.timer, /*distanceToPrevTarget));*/ totalDistance));
         controllerPos.Add(currentPos.ToString("F4"));
         cameraPos.Add(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position.ToString("F4"));
     }

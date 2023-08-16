@@ -18,16 +18,17 @@ public class WeightManager : MonoBehaviour
 
     public void Start()
     {
-        weightLight = GameObject.Find("ContainerPlastic");
+       // weightLight = GameObject.Find("ContainerPlastic");
         //weightLight = GameObject.Find("ContainerLight");
-        //weightLight = GameObject.Find("ContainerBamboo");
+        weightLight = GameObject.Find("ContainerBamboo");
+        //weightLight = GameObject.Find("ContainerMetalBar");
        // weightLight = GameObject.Find("ContainerWoodenPole");
-       // weightMediumLight = GameObject.Find("Container1Weight");
-        weightMediumLight = GameObject.Find("ContainerMedium");
-        //weightMediumHeavy = GameObject.Find("Container4Weight");
-        weightMediumHeavy = GameObject.Find("ContainerMedium2");
-        //weightHeavy = GameObject.Find("Container5Weight");
-        weightHeavy = GameObject.Find("ContainerVeryHeavy");
+        weightMediumLight = GameObject.Find("Container1Weight");
+       // weightMediumLight = GameObject.Find("ContainerMedium");
+        weightMediumHeavy = GameObject.Find("Container4Weight");
+        //weightMediumHeavy = GameObject.Find("ContainerMedium2");
+        weightHeavy = GameObject.Find("Container5Weight");
+        //weightHeavy = GameObject.Find("ContainerVeryHeavy");
 
         GameObject[] weightList = { weightLight, weightMediumLight, weightMediumHeavy, weightHeavy };
 

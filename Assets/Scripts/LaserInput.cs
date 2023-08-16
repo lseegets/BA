@@ -10,12 +10,15 @@ public class LaserInput : MonoBehaviour
     public Material activatedMaterial;
     public Material defaultMaterial;
 
-    private float countdown = 2.0f;
+    private const float DestructionTime = 0.2f;
+
+    private float countdown;
 
     // Start is called before the first frame update
     void Start()
     {
         currentObject = null;
+        countdown = DestructionTime;
     }
 
     // Update is called once per frame
@@ -44,6 +47,6 @@ public class LaserInput : MonoBehaviour
 
     private void ResetCountdown()
     {
-        countdown = 2.0f;
+        countdown = DestructionTime;
     }
 }

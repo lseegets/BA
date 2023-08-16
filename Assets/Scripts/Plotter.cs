@@ -23,7 +23,7 @@ public class Plotter : MonoBehaviour
         }
     }
 
-    public void WriteCSV(List<KeyValuePair<float, float>> dataList, /*List<Vector3> controllerPos,*/ List<string> controllerPos, /*List<Vector3> cameraPos,*/ List<string> cameraPos, Vector3 previousTarget, Vector3 currentTarget)
+    public void WriteCSV(List<KeyValuePair<float, float>> dataList, /*List<Vector3> controllerPos,*/ List<string> controllerPos, /*List<Vector3> cameraPos,*/ List<string> cameraPos, /*Vector3 previousTarget, Vector3 currentTarget*/ string previousTarget, string currentTarget)
     {
        // System.IO.Directory.CreateDirectory(directoryName);
         TextWriter writer = new StreamWriter(fileName, true);
