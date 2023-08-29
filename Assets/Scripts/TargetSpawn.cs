@@ -114,15 +114,17 @@ public class TargetSpawn : MonoBehaviour
         totalTime += Timer.timer;
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
-        plotter.WriteCSV(viveTracker.trackingData, viveTracker.controllerPos, viveTracker.cameraPos, previousTargetPos.ToString("F4"), currentTargetPos.ToString("F4"));
+        plotter.WriteCSV(viveTracker.trackingData, viveTracker.controllerPos, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F4"), currentTargetPos.ToString("F4"));
         Differentiate(viveTracker.trackingData);
         Differentiate2(viveTracker.trackingData);
         viveTracker.trackingData.Clear();
         viveTracker.controllerPos.Clear();
         viveTracker.cameraPos.Clear();
+        viveTracker.distanceToLastTarget.Clear();
+        viveTracker.distanceToCurrentTarget.Clear();
         viveTracker.totalDistance = 0;
         csvWriter.WriteCSV(playerData);
-        SendPositionData();
+       // SendPositionData();
         previousTargetPos = currentTargetPos;
 
         if (currentTargetCount < maxTargetCount) SpawnNextTarget();
@@ -157,6 +159,8 @@ public class TargetSpawn : MonoBehaviour
         currentTarget.transform.position = targetCenter;
         cameraPos = transform.position;
         currentTargetPos = currentTarget.transform.position;
+
+        SendPositionData();
 
         Timer.StartTimer();
     }
