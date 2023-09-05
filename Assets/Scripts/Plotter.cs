@@ -23,7 +23,7 @@ public class Plotter : MonoBehaviour
         }
     }
 
-    public void WriteCSV(List<KeyValuePair<float, float>> dataList, /*List<Vector3> controllerPos,*/ List<string> controllerPos, /*List<Vector3> cameraPos,*/ List<string> cameraPos, List<string> distanceToLastTarget, List<string> distanceToCurrentTarget, /*Vector3 previousTarget, Vector3 currentTarget*/ string previousTarget, string currentTarget)
+    public void WriteCSV(List<KeyValuePair<float, /*float*/decimal>> dataList, List<float> distanceToPrevPos, /*List<Vector3> controllerPos,*/ List<string> controllerPos, /*List<Vector3> cameraPos,*/ List<string> cameraPos, List<string> distanceToLastTarget, List<string> distanceToCurrentTarget, /*Vector3 previousTarget, Vector3 currentTarget*/ string previousTarget, string currentTarget, List<float> vectorX, List<float> vectorY, List<float> vectorZ)
     {
        // System.IO.Directory.CreateDirectory(directoryName);
         TextWriter writer = new StreamWriter(fileName, true);
@@ -32,7 +32,7 @@ public class Plotter : MonoBehaviour
 
         for (int i = 0; i < dataList.Count; i++)
         {
-            writer.WriteLine(dataList[i].Key + ";" + dataList[i].Value + ";" + controllerPos[i] + ";" +  cameraPos[i] + ";" + distanceToLastTarget[i] + ";" + distanceToCurrentTarget[i]);
+            writer.WriteLine(dataList[i].Key + ";" + dataList[i].Value + ";" + distanceToPrevPos[i] + ";" + controllerPos[i] + ";" +  cameraPos[i] + ";" + distanceToLastTarget[i] + ";" + distanceToCurrentTarget[i] + ";" + ";" + ";" + vectorX[i] + ";" + vectorY[i] + ";" + vectorZ[i]);
         }
 
         writer.Close();
@@ -41,7 +41,7 @@ public class Plotter : MonoBehaviour
     private void WriteHeader()
     {
         TextWriter writer = new StreamWriter(fileName, true);
-        writer.WriteLine("time;distance to prev position;controller position;camera position;distance to prev target;distance to current target");
+        writer.WriteLine("time;distance traveled;distance to prev position;controller position;camera position;distance to prev target;distance to current target");
         writer.Close();
     }
 }

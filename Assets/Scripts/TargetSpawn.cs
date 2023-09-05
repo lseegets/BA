@@ -114,14 +114,10 @@ public class TargetSpawn : MonoBehaviour
         totalTime += Timer.timer;
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
-        plotter.WriteCSV(viveTracker.trackingData, viveTracker.controllerPos, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F4"), currentTargetPos.ToString("F4"));
-        Differentiate(viveTracker.trackingData);
-        Differentiate2(viveTracker.trackingData);
-        viveTracker.trackingData.Clear();
-        viveTracker.controllerPos.Clear();
-        viveTracker.cameraPos.Clear();
-        viveTracker.distanceToLastTarget.Clear();
-        viveTracker.distanceToCurrentTarget.Clear();
+        plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F4"), currentTargetPos.ToString("F4"), viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
+        // Differentiate(viveTracker.trackingData);
+        //  Differentiate2(viveTracker.trackingData);
+        ClearTrackingData();
         viveTracker.totalDistance = 0;
         csvWriter.WriteCSV(playerData);
        // SendPositionData();
@@ -134,6 +130,19 @@ public class TargetSpawn : MonoBehaviour
     public void SendPositionData()
     {
         viveTracker.HandlePositionData(currentTargetPos, previousTargetPos);
+    }
+
+    private void ClearTrackingData()
+    {
+        viveTracker.trackingData.Clear();
+        viveTracker.controllerPos.Clear();
+        viveTracker.cameraPos.Clear();
+        viveTracker.distanceToPrevPos.Clear();
+        viveTracker.vectorX.Clear();
+        viveTracker.vectorY.Clear();
+        viveTracker.vectorY.Clear();
+        viveTracker.distanceToLastTarget.Clear();
+        viveTracker.distanceToCurrentTarget.Clear();
     }
 
     private void SpawnFirstTarget()

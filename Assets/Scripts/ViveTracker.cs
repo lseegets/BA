@@ -4,16 +4,27 @@ using UnityEngine;
 
 public class ViveTracker : MonoBehaviour
 {
-    public List<KeyValuePair<float, float>> trackingData = new();
+    //public List<KeyValuePair<float, float>> trackingData = new();
+    public List<KeyValuePair<float, decimal>> trackingData = new();
    // public List<Vector3> controllerPos = new();
     public List<string> controllerPos = new();
+
+    //public List<string> distanceToPrevPos = new();
+    public List<float> distanceToPrevPos = new();
+
     //public List<Vector3> cameraPos = new();
     public List<string> cameraPos = new();
     public List<string> distanceToLastTarget = new();
     public List<string> distanceToCurrentTarget = new();
 
+    public List<float> vectorX = new();
+    public List<float> vectorY = new();
+    public List<float> vectorZ = new();
+
     public Vector3 lastPos;
-    public float totalDistance = 0;
+
+    //public float totalDistance = 0;
+    public decimal totalDistance = 0;
 
     private Vector3 currentPos;
 
@@ -96,25 +107,47 @@ public class ViveTracker : MonoBehaviour
 
     private void CalculateDistance()
     {
-        float distance = (currentPos - lastPos).magnitude;
+        float distance = Vector3.Distance(currentPos, lastPos); //(currentPos - lastPos).magnitude;
+
+        decimal distanceDecimal = (decimal)distance;
 
       //  distanceToPrevTarget = (currentPos - previousTargetPos).magnitude;
 
-        if (goingForward)
+        /*if (goingForward)
         {
             totalDistance += distance;
         }
         else if (!goingForward)
         {
             totalDistance -= distance;
+        }*/
+
+        if (goingForward)
+        {
+            totalDistance += distanceDecimal;
+        }
+        else if (!goingForward)
+        {
+            totalDistance -= distanceDecimal;
         }
 
-        trackingData.Add(new KeyValuePair<float, float>(Timer.timer, /*distanceToPrevTarget));*/ totalDistance));
+        //trackingData.Add(new KeyValuePair<float, float>(Timer.timer, /*distanceToPrevTarget));*/ totalDistance));
+        trackingData.Add(new KeyValuePair<float, decimal>(Timer.timer, /*distanceToPrevTarget));*/ totalDistance));
         controllerPos.Add(currentPos.ToString("F4"));
+        distanceToPrevPos.Add(Vector3.Distance(currentPos, lastPos));
         cameraPos.Add(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position.ToString("F4"));
        // distanceToLastTarget.Add(distanceToPrevTarget.ToString("F4"));
         distanceToLastTarget.Add(prevDistance.ToString("F4"));
         distanceToCurrentTarget.Add(distanceToCurrTarget.ToString("F4"));
+
+        vectorX.Add(currentPos.x);
+        vectorY.Add(currentPos.y);
+        vectorZ.Add(currentPos.z);
+
+        Debug.Log("CURRENTPOS: " + currentPos);
+        Debug.Log("X: " + currentPos.x);
+        Debug.Log("Y: " + currentPos.y);
+        Debug.Log("Z: " + currentPos.z);
     }
 
 
