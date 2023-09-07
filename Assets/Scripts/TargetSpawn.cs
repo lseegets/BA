@@ -140,7 +140,7 @@ public class TargetSpawn : MonoBehaviour
         viveTracker.distanceToPrevPos.Clear();
         viveTracker.vectorX.Clear();
         viveTracker.vectorY.Clear();
-        viveTracker.vectorY.Clear();
+        viveTracker.vectorZ.Clear();
         viveTracker.distanceToLastTarget.Clear();
         viveTracker.distanceToCurrentTarget.Clear();
     }
