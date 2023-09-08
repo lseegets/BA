@@ -25,9 +25,7 @@ public class TargetSpawn : MonoBehaviour
     private Vector3 currentTargetPos;
     private Vector3 cameraPos;
 
-    // !!!
-    public int currentTargetCount = 0;
-    // !!!
+    private int currentTargetCount = 0;
 
     private float totalTime = 0;
 
@@ -114,11 +112,14 @@ public class TargetSpawn : MonoBehaviour
         totalTime += Timer.timer;
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
-        plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F4"), currentTargetPos.ToString("F4"), viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
+        plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos, currentTargetPos, viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
+        plotter.WriteCSV2(viveTracker.trackingData2, viveTracker.distanceToPrevPos2, viveTracker.controllerPos2, viveTracker.cameraPos, viveTracker.distanceToLastTarget2, viveTracker.distanceToCurrentTarget2, previousTargetPos, currentTargetPos, viveTracker.vectorX2, viveTracker.vectorY2);
         // Differentiate(viveTracker.trackingData);
         //  Differentiate2(viveTracker.trackingData);
         ClearTrackingData();
+        ClearTrackingData2();
         viveTracker.totalDistance = 0;
+        viveTracker.totalDistance2 = 0;
         csvWriter.WriteCSV(playerData);
        // SendPositionData();
         previousTargetPos = currentTargetPos;
@@ -143,6 +144,17 @@ public class TargetSpawn : MonoBehaviour
         viveTracker.vectorZ.Clear();
         viveTracker.distanceToLastTarget.Clear();
         viveTracker.distanceToCurrentTarget.Clear();
+    }
+
+    private void ClearTrackingData2()
+    {
+        viveTracker.trackingData2.Clear();
+        viveTracker.controllerPos2.Clear();
+        viveTracker.distanceToPrevPos2.Clear();
+        viveTracker.vectorX2.Clear();
+        viveTracker.vectorY2.Clear();
+        viveTracker.distanceToLastTarget2.Clear();
+        viveTracker.distanceToCurrentTarget2.Clear();
     }
 
     private void SpawnFirstTarget()
