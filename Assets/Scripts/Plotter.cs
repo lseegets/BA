@@ -29,7 +29,7 @@ public class Plotter : MonoBehaviour
         }
     }
 
-    public void WriteCSV(List<KeyValuePair<float, /*float*/decimal>> dataList, List<decimal> distanceToPrevPos, List<string> controllerPos, List<string> cameraPos, List<decimal> distanceToLastTarget, List<float> distanceToCurrentTarget, Vector3 previousTarget, Vector3 currentTarget,/* string previousTarget, string currentTarget,*/ List<float> vectorX, List<float> vectorY, List<float> vectorZ)
+    public void WriteCSV(List<KeyValuePair<float, /*float*/decimal>> dataList, List<decimal> distanceToPrevPos, List<string> controllerPos, List<Quaternion> rotation, List<string> cameraPos, List<decimal> distanceToLastTarget, List<float> distanceToCurrentTarget, Vector3 previousTarget, Vector3 currentTarget,/* string previousTarget, string currentTarget,*/ List<float> vectorX, List<float> vectorY, List<float> vectorZ)
     {
        // System.IO.Directory.CreateDirectory(directoryName);
         TextWriter writer = new StreamWriter(fileName, true);
@@ -38,13 +38,13 @@ public class Plotter : MonoBehaviour
 
         for (int i = 0; i < dataList.Count; i++)
         {
-            writer.WriteLine(dataList[i].Key + ";" + dataList[i].Value + ";" + distanceToPrevPos[i] + ";" + controllerPos[i] + ";" +  cameraPos[i] + ";" + distanceToLastTarget[i] + ";" + distanceToCurrentTarget[i] + ";" + ";" + ";" + vectorX[i] + ";" + vectorY[i] + ";" /*+ vectorZ[i]*/);
+            writer.WriteLine(dataList[i].Key + ";" + dataList[i].Value + ";" + distanceToPrevPos[i] + ";" + controllerPos[i] + ";" + rotation[i] + ";" + cameraPos[i] + ";" + distanceToLastTarget[i] + ";" + distanceToCurrentTarget[i] + ";" + ";" + ";" + vectorX[i] + ";" + vectorY[i] + ";" + vectorZ[i]);
         }
 
         writer.Close();
     }
 
-    public void WriteCSV2(List<KeyValuePair<float, /*float*/decimal>> dataList, List<decimal> distanceToPrevPos, List<string> controllerPos, List<string> cameraPos, List<decimal> distanceToLastTarget, List<float> distanceToCurrentTarget, Vector3 previousTarget, Vector3 currentTarget /*string previousTarget, string currentTarget*/, List<float> vectorX, List<float> vectorY)
+    public void WriteCSV2(List<KeyValuePair<float, /*float*/decimal>> dataList, List<decimal> distanceToPrevPos, List<string> controllerPos, List<Quaternion> rotation, List<string> cameraPos, List<decimal> distanceToLastTarget, List<float> distanceToCurrentTarget, Vector3 previousTarget, Vector3 currentTarget /*string previousTarget, string currentTarget*/, List<float> vectorX, List<float> vectorY)
     {
         // System.IO.Directory.CreateDirectory(directoryName);
         TextWriter writer = new StreamWriter(fileName2, true);
@@ -53,7 +53,7 @@ public class Plotter : MonoBehaviour
 
         for (int i = 0; i < dataList.Count; i++)
         {
-            writer.WriteLine(dataList[i].Key + ";" + dataList[i].Value + ";" + distanceToPrevPos[i] + ";" + controllerPos[i] + ";" + cameraPos[i] + ";" + distanceToLastTarget[i] + ";" + distanceToCurrentTarget[i] + ";" + ";" + ";" + vectorX[i] + ";" + vectorY[i]);
+            writer.WriteLine(dataList[i].Key + ";" + dataList[i].Value + ";" + distanceToPrevPos[i] + ";" + controllerPos[i] + ";" + rotation[i] + ";" + cameraPos[i] + ";" + distanceToLastTarget[i] + ";" + distanceToCurrentTarget[i] + ";" + ";" + ";" + vectorX[i] + ";" + vectorY[i]);
         }
 
         writer.Close();
@@ -62,13 +62,13 @@ public class Plotter : MonoBehaviour
     private void WriteHeader()
     {
         TextWriter writer = new StreamWriter(fileName, true);
-        writer.WriteLine("time;distance traveled;distance to prev position;controller position;camera position;distance to prev target;distance to current target");
+        writer.WriteLine("time;distance traveled;distance to prev position;controller position;controller rotation;camera position;distance to prev target;distance to current target");
         writer.Close();
     }
     private void WriteHeader2()
     {
         TextWriter writer = new StreamWriter(fileName2, true);
-        writer.WriteLine("time;distance traveled;distance to prev position;controller position;camera position;distance to prev target;distance to current target");
+        writer.WriteLine("time;distance traveled;distance to prev position;controller position;controller rotation;camera position;distance to prev target;distance to current target");
         writer.Close();
     }
 }

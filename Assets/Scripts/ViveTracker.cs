@@ -12,6 +12,9 @@ public class ViveTracker : MonoBehaviour
     public List<decimal> distanceToPrevPos = new();
 
     public List<string> cameraPos = new();
+    public List<Quaternion> controllerRot = new();
+
+
     public List<decimal> distanceToLastTarget = new();
    // public List<string> distanceToLastTarget = new();
     public List<float> distanceToCurrentTarget = new();
@@ -49,6 +52,8 @@ public class ViveTracker : MonoBehaviour
     private Vector3 currentPos;
     private Vector2 currentPos2;
 
+    private Quaternion rot;
+
     private bool goingForward;
     private bool goingForward2;
 
@@ -79,6 +84,7 @@ public class ViveTracker : MonoBehaviour
     {
         lastPos = transform.position;
         lastPos2 = transform.position;
+        rot = transform.rotation;
 
         totalDistance = 0;
         totalDistance2 = 0;
@@ -96,8 +102,7 @@ public class ViveTracker : MonoBehaviour
     void FixedUpdate()
     {
         TrackMovement();
-        Debug.Log(currentTargetPos);
-        Debug.Log(previousTargetPos);
+        rot = transform.rotation;
     }
 
     public void TrackMovement()
@@ -194,6 +199,7 @@ public class ViveTracker : MonoBehaviour
         controllerPos2.Add(currentPos2.ToString("F9"));
         distanceToPrevPos2.Add(distanceDecimal2);
         cameraPos.Add(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position.ToString("F9"));
+        controllerRot.Add(rot);
         // distanceToLastTarget.Add(distanceToPrevTarget.ToString("F4"));
         distanceToLastTarget2.Add(prevDistanceDecimal2);
         distanceToCurrentTarget2.Add(distanceToCurrTarget2);
@@ -233,7 +239,8 @@ public class ViveTracker : MonoBehaviour
         controllerPos.Add(currentPos.ToString("F9"));
         distanceToPrevPos.Add(distanceDecimal);
         cameraPos.Add(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position.ToString("F9"));
-       // distanceToLastTarget.Add(distanceToPrevTarget.ToString("F4"));
+        controllerRot.Add(rot);
+        // distanceToLastTarget.Add(distanceToPrevTarget.ToString("F4"));
         distanceToLastTarget.Add(prevDistanceDecimal);
         distanceToCurrentTarget.Add(distanceToCurrTarget);
 

@@ -16,14 +16,20 @@ public class TargetSpawn : MonoBehaviour
     public int playerId;
     public string weightLevel;
 
-    private Vector3 previousTargetPos;
+    //!
+    public Vector3 previousTargetPos;
+    // !!
+    public Vector3 normal;
+    public Vector3 currentTargetPos;
 
-    [SerializeField] GameObject target;
+    [SerializeField] GameObject target, planePrefab;
     [SerializeField] Text display;
 
     private GameObject currentTarget;
-    private Vector3 currentTargetPos;
+    private GameObject currentPlane;
+    
     private Vector3 cameraPos;
+    private Plane plane;
 
     private int currentTargetCount = 0;
 
@@ -38,9 +44,12 @@ public class TargetSpawn : MonoBehaviour
     float distanceToPlayer;
     float distanceToPrevTarget;
 
+   
+
     // Start is called before the first frame update
     void Start()
     {
+        plane = new Plane(Vector3.Cross(cameraPos, currentTargetPos - previousTargetPos), currentTargetPos);
         SpawnFirstTarget();
         csvWriter = new CSVWriter(playerId);
         //weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
@@ -112,8 +121,8 @@ public class TargetSpawn : MonoBehaviour
         totalTime += Timer.timer;
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
-        plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos, currentTargetPos, viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
-        plotter.WriteCSV2(viveTracker.trackingData2, viveTracker.distanceToPrevPos2, viveTracker.controllerPos2, viveTracker.cameraPos, viveTracker.distanceToLastTarget2, viveTracker.distanceToCurrentTarget2, previousTargetPos, currentTargetPos, viveTracker.vectorX2, viveTracker.vectorY2);
+        plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos, currentTargetPos, viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
+        plotter.WriteCSV2(viveTracker.trackingData2, viveTracker.distanceToPrevPos2, viveTracker.controllerPos2, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget2, viveTracker.distanceToCurrentTarget2, previousTargetPos, currentTargetPos, viveTracker.vectorX2, viveTracker.vectorY2);
         // Differentiate(viveTracker.trackingData);
         //  Differentiate2(viveTracker.trackingData);
         ClearTrackingData();
@@ -137,6 +146,7 @@ public class TargetSpawn : MonoBehaviour
     {
         viveTracker.trackingData.Clear();
         viveTracker.controllerPos.Clear();
+        viveTracker.controllerRot.Clear();
         viveTracker.cameraPos.Clear();
         viveTracker.distanceToPrevPos.Clear();
         viveTracker.vectorX.Clear();
@@ -150,6 +160,7 @@ public class TargetSpawn : MonoBehaviour
     {
         viveTracker.trackingData2.Clear();
         viveTracker.controllerPos2.Clear();
+        viveTracker.controllerRot.Clear();
         viveTracker.distanceToPrevPos2.Clear();
         viveTracker.vectorX2.Clear();
         viveTracker.vectorY2.Clear();
@@ -165,6 +176,7 @@ public class TargetSpawn : MonoBehaviour
         currentTarget.transform.position = currentTarget.transform.position + firstTargetVector;
         currentTargetPos = currentTarget.transform.position;
         previousTargetPos = currentTargetPos;
+       // currentPlane = Instantiate(planePrefab, new Vector3(0, 0, 0), transform.rotation);
 
         cameraPos = transform.position;
         distanceToPlayer = Mathf.Abs(Vector3.Distance(currentTarget.transform.position, cameraPos));
@@ -180,10 +192,68 @@ public class TargetSpawn : MonoBehaviour
         currentTarget.transform.position = targetCenter;
         cameraPos = transform.position;
         currentTargetPos = currentTarget.transform.position;
+        CreatePlane();
+        // currentPlane.transform.position = currentTargetPos;
+        // currentPlane.transform.rotation = Quaternion.LookRotation(new Vector3(0, 0, previousTargetPos.y));
 
         SendPositionData();
 
         Timer.StartTimer();
+    }
+
+    private void CreatePlane()
+    {
+        normal = Vector3.Cross(currentTargetPos - previousTargetPos, cameraPos).normalized;
+        Vector3 normal2 = Vector3.Cross(cameraPos, currentTargetPos - previousTargetPos);
+        plane.SetNormalAndPosition(normal, currentTargetPos);
+        OnDrawGizmos();
+
+        Debug.Log(normal);
+        Debug.Log(normal2);
+    }
+
+     void OnDrawGizmos()
+    {
+        //plane = new Plane(normal, currentTargetPos);
+
+        // Draw our three input points in world space.
+        // b and c are drawn as lollipops from the preceding point,
+        // so that you can see the clockwise winding direction.
+
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(currentTargetPos, 0.1f);
+
+        Gizmos.color = Color.gray;
+        Gizmos.DrawLine(currentTargetPos, previousTargetPos);
+        Gizmos.DrawWireSphere(previousTargetPos, 0.1f);
+
+        Gizmos.color = Color.black;
+        Gizmos.DrawLine(previousTargetPos, normal);
+        Gizmos.DrawWireSphere(normal, 0.1f);
+
+        // Draw this object's position, 
+        // as a lollipop sticking out from our plane,
+        // blue-green if in front (in the positive half-space),
+        // and red if behind (negative half-space).           
+        Gizmos.color = plane.GetSide(transform.position) ? Color.cyan : Color.red;
+        Gizmos.DrawLine(plane.ClosestPointOnPlane(transform.position), transform.position);
+        Gizmos.DrawWireSphere(transform.position, 0.2f);
+
+        // Draw plane normal.
+        Gizmos.color = Color.yellow;
+        var center = (currentTargetPos + previousTargetPos + normal) / 3f;
+        Gizmos.DrawLine(center, center + plane.normal);
+
+        // Draw planar grid.
+        Gizmos.color = Color.blue;
+        var matrix = Gizmos.matrix;
+        Gizmos.matrix = Matrix4x4.TRS(center, Quaternion.LookRotation(plane.normal), Vector3.one);
+        for (int i = -10; i <= 10; i++)
+        {
+            Gizmos.DrawLine(new Vector3(i, -10, 0), new Vector3(i, 10, 0));
+            Gizmos.DrawLine(new Vector3(-10, i, 0), new Vector3(10, i, 0));
+        }
+        Gizmos.matrix = matrix;
     }
 
     private void Differentiate(List<KeyValuePair<float, float>> list)
