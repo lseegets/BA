@@ -51,7 +51,7 @@ public class TargetSpawn : MonoBehaviour
     void Start()
     {
         plane = new Plane(Vector3.Cross(cameraPos, currentTargetPos - previousTargetPos), currentTargetPos);
-        laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
+     //   laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
         SpawnFirstTarget();
         csvWriter = new CSVWriter(playerId);
         //weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
@@ -63,10 +63,8 @@ public class TargetSpawn : MonoBehaviour
     {
         if (Timer.keepTiming) Timer.UpdateTimer();
         if (weight == null) weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
-        //if (tracker == null) tracker = weight.transform.Find("TrackPoint").GetComponent<Tracker>();
-        // if (viveTracker == null) viveTracker = GameObject.Find("CameraRig.ViveTracker").GetComponent<ViveTracker>();
         if (viveTracker == null) viveTracker = transform.parent.Find("ViveTracker").GetComponent<ViveTracker>();
-        Debug.Log("CURRENT TARGET: " + currentTargetPos);
+        if (laserInput == null) laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
     }
 
     public Vector3 ComputeTargetCenter()
@@ -124,16 +122,17 @@ public class TargetSpawn : MonoBehaviour
         totalTime += Timer.timer;
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
-        plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos, currentTargetPos, viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
+        plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
        // plotter.WriteCSV2(viveTracker.trackingData2, viveTracker.distanceToPrevPos2, viveTracker.controllerPos2, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget2, viveTracker.distanceToCurrentTarget2, previousTargetPos, currentTargetPos, viveTracker.vectorX2, viveTracker.vectorY2);
-        plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos, currentTargetPos);
+        plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"));
         // Differentiate(viveTracker.trackingData);
         //  Differentiate2(viveTracker.trackingData);
         ClearTrackingData();
         //ClearTrackingData2();
         ClearRayTrackingData();
+        laserInput.totalDistance = 0;
         viveTracker.totalDistance = 0;
-        viveTracker.totalDistance2 = 0;
+        //  viveTracker.totalDistance2 = 0;
         csvWriter.WriteCSV(playerData);
         SendPositionData();
         previousTargetPos = currentTargetPos;

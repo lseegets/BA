@@ -4,34 +4,21 @@ using UnityEngine;
 
 public class ViveTracker : MonoBehaviour
 {
-    //public List<KeyValuePair<float, float>> trackingData = new();
     public List<KeyValuePair<float, decimal>> trackingData = new();
     public List<string> controllerPos = new();
 
-    //public List<string> distanceToPrevPos = new();
     public List<decimal> distanceToPrevPos = new();
 
     public List<string> cameraPos = new();
     public List<Quaternion> controllerRot = new();
 
-
     public List<decimal> distanceToLastTarget = new();
-   // public List<string> distanceToLastTarget = new();
     public List<float> distanceToCurrentTarget = new();
-    //public List<string> distanceToCurrentTarget = new();
 
     public List<float> vectorX = new();
     public List<float> vectorY = new();
     public List<float> vectorZ = new();
 
-    // RAY STUFF
-
-    
-
-
-    //RAY STUFF
-
-    /// 
     //public List<KeyValuePair<float, float>> trackingData2 = new();
     public List<KeyValuePair<float, decimal>> trackingData2 = new();
     public List<string> controllerPos2 = new();
@@ -63,13 +50,11 @@ public class ViveTracker : MonoBehaviour
     private bool goingForward;
     private bool goingForward2;
 
-    private float prevDistance;
+    private decimal prevDistance;
     private float prevDistance2;
-    private float currentDistance;
+    private decimal currentDistance;
     private float currentDistance2;
-    private decimal prevDistanceDecimal;
     private decimal prevDistanceDecimal2;
-    private decimal currentDistanceDecimal;
     private decimal currentDistanceDecimal2;
 
     //private float distanceToPrevTarget;
@@ -95,9 +80,8 @@ public class ViveTracker : MonoBehaviour
        // totalDistance = 0;
        // totalDistance2 = 0;
 
-        prevDistance = Vector3.Distance(previousTargetPos, lastPos);
+        prevDistance = (decimal)Vector3.Distance(previousTargetPos, lastPos);
         prevDistance2 = Vector2.Distance(previousTargetPos2, lastPos2);
-        prevDistanceDecimal = (decimal)prevDistance;
         prevDistanceDecimal2 = (decimal)prevDistance2;
 
         distanceToCurrTarget = Vector3.Distance(currentTargetPos, lastPos);
@@ -142,21 +126,19 @@ public class ViveTracker : MonoBehaviour
 
     private void CheckDistanceToTargets()
     {
-        currentDistance = Vector3.Distance(previousTargetPos, currentPos);
-        currentDistanceDecimal = (decimal)currentDistance;
+        currentDistance = (decimal)Vector3.Distance(previousTargetPos, currentPos);
 
-        if (prevDistanceDecimal <= currentDistanceDecimal)
+        if (prevDistance <= currentDistance)
         {
             goingForward = true;
         }
-        else if (prevDistanceDecimal > currentDistanceDecimal)
+        else if (prevDistance > currentDistance)
         {
             goingForward = false;
         }
 
         //distanceToPrevTarget = prevDistanceDecimal;
         prevDistance = currentDistance;
-        prevDistanceDecimal = currentDistanceDecimal;
         distanceToCurrTarget = Vector3.Distance(currentTargetPos, currentPos);
     }
 
@@ -242,7 +224,7 @@ public class ViveTracker : MonoBehaviour
         cameraPos.Add(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position.ToString("F9"));
         controllerRot.Add(rot);
         // distanceToLastTarget.Add(distanceToPrevTarget.ToString("F4"));
-        distanceToLastTarget.Add(prevDistanceDecimal);
+        distanceToLastTarget.Add(prevDistance);
         distanceToCurrentTarget.Add(distanceToCurrTarget);
 
         vectorX.Add(currentPos.x);

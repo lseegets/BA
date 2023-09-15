@@ -28,12 +28,11 @@ public class LaserInput : MonoBehaviour
     public List<float> rayDistanceToCurrentTarget = new();
     public List<decimal> rayDistanceToPrevPos = new();
 
-    public decimal totalRayDistance = 0;
+    public decimal totalDistance = 0;
     private decimal prevRayDistance;
     private decimal currentRayDistance;
     private float rayDistanceToCurrTarget;
     private bool goingForward;
-    private decimal totalDistance = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -117,8 +116,6 @@ public class LaserInput : MonoBehaviour
                 if (currentObject != null) currentObject.GetComponent<MeshRenderer>().material = defaultMaterial;
             }
         }
-        Debug.Log("Last: " + lastRayPos);
-        Debug.Log("Current: " + currentRayPos);
     }
 
     public void GetPlaneData(Plane plane)
