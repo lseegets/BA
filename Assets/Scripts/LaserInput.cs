@@ -7,6 +7,8 @@ public class LaserInput : MonoBehaviour
     [SerializeField] GameObject cube;
 
     public static GameObject currentObject;
+    public List<KeyValuePair<float, decimal>> trackingData = new();
+    public List<string> cameraPos = new();
 
     public Material activatedMaterial;
     public Material defaultMaterial;
@@ -18,6 +20,20 @@ public class LaserInput : MonoBehaviour
     private ViveTracker viveTracker;
     private Vector3 currentRayPos;
     private Vector3 lastRayPos;
+    private Vector3 currentTargetPos;
+    private Vector3 previousTargetPos;
+
+    public List<string> rayPos = new();
+    public List<decimal> rayDistanceToLastTarget = new();
+    public List<float> rayDistanceToCurrentTarget = new();
+    public List<decimal> rayDistanceToPrevPos = new();
+
+    public decimal totalRayDistance = 0;
+    private decimal prevRayDistance;
+    private decimal currentRayDistance;
+    private float rayDistanceToCurrTarget;
+    private bool goingForward;
+    private decimal totalDistance = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +43,10 @@ public class LaserInput : MonoBehaviour
         viveTracker = GameObject.FindGameObjectsWithTag("Tracker")[0].GetComponent<ViveTracker>();
 
         lastRayPos = new Vector3(0, 0, 0);
+
+        prevRayDistance = (decimal)Vector3.Distance(previousTargetPos, lastRayPos);
+
+        rayDistanceToCurrTarget = Vector3.Distance(currentTargetPos, lastRayPos);
     }
 
     // Update is called once per frame
@@ -73,8 +93,10 @@ public class LaserInput : MonoBehaviour
             {
                 Vector3 hitPoint = ray.GetPoint(enter);
                 currentRayPos = hitPoint;
+                CheckDistanceToTargets();
+                CalculateDistance();
                 cube.transform.position = hitPoint;
-                SendRayData(currentRayPos, lastRayPos);
+                //SendRayData(currentRayPos, lastRayPos);
                 lastRayPos = currentRayPos;
                 //Debug.Log(hitPoint);
             }
@@ -95,6 +117,8 @@ public class LaserInput : MonoBehaviour
                 if (currentObject != null) currentObject.GetComponent<MeshRenderer>().material = defaultMaterial;
             }
         }
+        Debug.Log("Last: " + lastRayPos);
+        Debug.Log("Current: " + currentRayPos);
     }
 
     public void GetPlaneData(Plane plane)
@@ -103,9 +127,56 @@ public class LaserInput : MonoBehaviour
       //  Debug.Log("Sent Plane Data");
     }
 
-    public void SendRayData(Vector3 currentRayPos, Vector3 lastRayPos)
+   /* public void SendRayData(Vector3 currentRayPos, Vector3 lastRayPos)
     {
         viveTracker.HandleRayData(currentRayPos, lastRayPos);
+    }*/
+
+    public void HandlePositionData(Vector3 currentTarget, Vector3 previousTarget)
+    {
+        currentTargetPos = currentTarget;
+        previousTargetPos = previousTarget;
+    }
+
+    private void CheckDistanceToTargets()
+    {
+        currentRayDistance = (decimal)Vector3.Distance(previousTargetPos, currentRayPos);
+
+        if (prevRayDistance <= currentRayDistance)
+        {
+            goingForward = true;
+        }
+        else if (prevRayDistance > currentRayDistance)
+        {
+            goingForward = false;
+        }
+
+        prevRayDistance = currentRayDistance;
+        rayDistanceToCurrTarget = Vector3.Distance(currentTargetPos, currentRayPos);
+    }
+
+    private void CalculateDistance()
+    {
+        decimal distance = (decimal)Vector3.Distance(currentRayPos, lastRayPos);
+
+        //  distanceToPrevTarget = (currentPos - previousTargetPos).magnitude;
+
+        if (goingForward)
+        {
+            totalDistance += distance;
+        }
+        else if (!goingForward)
+        {
+            totalDistance -= distance;
+        }
+
+        trackingData.Add(new KeyValuePair<float, decimal>(Timer.timer, totalDistance));
+        rayPos.Add(currentRayPos.ToString("F9"));
+        rayDistanceToPrevPos.Add(distance);
+        cameraPos.Add(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position.ToString("F9"));
+        // distanceToLastTarget.Add(distanceToPrevTarget.ToString("F4"));
+        rayDistanceToLastTarget.Add(prevRayDistance);
+        rayDistanceToCurrentTarget.Add(rayDistanceToCurrTarget);
     }
 
     private void ResetCountdown()

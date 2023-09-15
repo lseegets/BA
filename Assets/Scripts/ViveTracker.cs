@@ -24,6 +24,12 @@ public class ViveTracker : MonoBehaviour
     public List<float> vectorY = new();
     public List<float> vectorZ = new();
 
+    // RAY STUFF
+
+    
+
+
+    //RAY STUFF
 
     /// 
     //public List<KeyValuePair<float, float>> trackingData2 = new();
@@ -79,9 +85,6 @@ public class ViveTracker : MonoBehaviour
 
     private int currentTargetCount;
 
-    private Vector3 currentRayPos;
-    private Vector3 lastRayPos;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -89,8 +92,8 @@ public class ViveTracker : MonoBehaviour
         lastPos2 = transform.position;
         rot = transform.rotation;
 
-        totalDistance = 0;
-        totalDistance2 = 0;
+       // totalDistance = 0;
+       // totalDistance2 = 0;
 
         prevDistance = Vector3.Distance(previousTargetPos, lastPos);
         prevDistance2 = Vector2.Distance(previousTargetPos2, lastPos2);
@@ -106,9 +109,6 @@ public class ViveTracker : MonoBehaviour
     {
         TrackMovement();
         rot = transform.rotation;
-
-        Debug.Log("Last: " + lastRayPos);
-        Debug.Log("Current: " + currentRayPos);
     }
 
     public void TrackMovement()
@@ -134,11 +134,11 @@ public class ViveTracker : MonoBehaviour
         previousTargetPos2 = previousTarget;
     }
 
-    public void HandleRayData(Vector3 currentRayPos, Vector3 lastRayPos)
+    /*public void HandleRayData(Vector3 currentRayPos, Vector3 lastRayPos)
     {
         this.currentRayPos = currentRayPos;
         this.lastRayPos = lastRayPos;
-    }
+    }*/
 
     private void CheckDistanceToTargets()
     {
@@ -222,34 +222,23 @@ public class ViveTracker : MonoBehaviour
 
     private void CalculateDistance()
     {
-        float distance = Vector3.Distance(currentPos, lastPos); //(currentPos - lastPos).magnitude;
-
-        decimal distanceDecimal = (decimal)distance;
+        decimal distance = (decimal)Vector3.Distance(currentPos, lastPos); //(currentPos - lastPos).magnitude;
 
       //  distanceToPrevTarget = (currentPos - previousTargetPos).magnitude;
 
-        /*if (goingForward)
+        if (goingForward)
         {
             totalDistance += distance;
         }
         else if (!goingForward)
         {
             totalDistance -= distance;
-        }*/
-
-        if (goingForward)
-        {
-            totalDistance += distanceDecimal;
-        }
-        else if (!goingForward)
-        {
-            totalDistance -= distanceDecimal;
         }
 
         //trackingData.Add(new KeyValuePair<float, float>(Timer.timer, /*distanceToPrevTarget));*/ totalDistance));
         trackingData.Add(new KeyValuePair<float, decimal>(Timer.timer, /*distanceToPrevTarget));*/ totalDistance));
         controllerPos.Add(currentPos.ToString("F9"));
-        distanceToPrevPos.Add(distanceDecimal);
+        distanceToPrevPos.Add(distance);
         cameraPos.Add(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position.ToString("F9"));
         controllerRot.Add(rot);
         // distanceToLastTarget.Add(distanceToPrevTarget.ToString("F4"));
@@ -260,6 +249,5 @@ public class ViveTracker : MonoBehaviour
         vectorY.Add(currentPos.y);
         vectorZ.Add(currentPos.z);
     }
-
 
 }

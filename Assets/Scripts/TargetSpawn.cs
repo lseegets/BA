@@ -125,11 +125,13 @@ public class TargetSpawn : MonoBehaviour
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
         plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos, currentTargetPos, viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
-        plotter.WriteCSV2(viveTracker.trackingData2, viveTracker.distanceToPrevPos2, viveTracker.controllerPos2, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget2, viveTracker.distanceToCurrentTarget2, previousTargetPos, currentTargetPos, viveTracker.vectorX2, viveTracker.vectorY2);
+       // plotter.WriteCSV2(viveTracker.trackingData2, viveTracker.distanceToPrevPos2, viveTracker.controllerPos2, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget2, viveTracker.distanceToCurrentTarget2, previousTargetPos, currentTargetPos, viveTracker.vectorX2, viveTracker.vectorY2);
+        plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos, currentTargetPos);
         // Differentiate(viveTracker.trackingData);
         //  Differentiate2(viveTracker.trackingData);
         ClearTrackingData();
-        ClearTrackingData2();
+        //ClearTrackingData2();
+        ClearRayTrackingData();
         viveTracker.totalDistance = 0;
         viveTracker.totalDistance2 = 0;
         csvWriter.WriteCSV(playerData);
@@ -143,6 +145,7 @@ public class TargetSpawn : MonoBehaviour
     public void SendPositionData()
     {
         viveTracker.HandlePositionData(currentTargetPos, previousTargetPos);
+        laserInput.HandlePositionData(currentTargetPos, previousTargetPos);
     }
 
     private void ClearTrackingData()
@@ -169,6 +172,16 @@ public class TargetSpawn : MonoBehaviour
         viveTracker.vectorY2.Clear();
         viveTracker.distanceToLastTarget2.Clear();
         viveTracker.distanceToCurrentTarget2.Clear();
+    }
+
+    private void ClearRayTrackingData()
+    {
+        laserInput.trackingData.Clear();
+        laserInput.rayPos.Clear();
+        laserInput.cameraPos.Clear();
+        laserInput.rayDistanceToPrevPos.Clear();
+        laserInput.rayDistanceToLastTarget.Clear();
+        laserInput.rayDistanceToCurrentTarget.Clear();
     }
 
     private void SpawnFirstTarget()
