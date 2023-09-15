@@ -39,6 +39,7 @@ public class TargetSpawn : MonoBehaviour
     private Plotter plotter;
     private Tracker tracker;
     private ViveTracker viveTracker;
+    private LaserInput laserInput;
     private GameObject weight;
 
     float distanceToPlayer;
@@ -50,6 +51,7 @@ public class TargetSpawn : MonoBehaviour
     void Start()
     {
         plane = new Plane(Vector3.Cross(cameraPos, currentTargetPos - previousTargetPos), currentTargetPos);
+        laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
         SpawnFirstTarget();
         csvWriter = new CSVWriter(playerId);
         //weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
@@ -57,13 +59,14 @@ public class TargetSpawn : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (Timer.keepTiming) Timer.UpdateTimer();
         if (weight == null) weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
         //if (tracker == null) tracker = weight.transform.Find("TrackPoint").GetComponent<Tracker>();
         // if (viveTracker == null) viveTracker = GameObject.Find("CameraRig.ViveTracker").GetComponent<ViveTracker>();
         if (viveTracker == null) viveTracker = transform.parent.Find("ViveTracker").GetComponent<ViveTracker>();
+        Debug.Log("CURRENT TARGET: " + currentTargetPos);
     }
 
     public Vector3 ComputeTargetCenter()
@@ -130,7 +133,7 @@ public class TargetSpawn : MonoBehaviour
         viveTracker.totalDistance = 0;
         viveTracker.totalDistance2 = 0;
         csvWriter.WriteCSV(playerData);
-       // SendPositionData();
+        SendPositionData();
         previousTargetPos = currentTargetPos;
 
         if (currentTargetCount < maxTargetCount) SpawnNextTarget();
@@ -204,15 +207,17 @@ public class TargetSpawn : MonoBehaviour
     private void CreatePlane()
     {
         normal = Vector3.Cross(currentTargetPos - previousTargetPos, cameraPos).normalized;
-        Vector3 normal2 = Vector3.Cross(cameraPos, currentTargetPos - previousTargetPos);
         plane.SetNormalAndPosition(normal, currentTargetPos);
-        OnDrawGizmos();
-
-        Debug.Log(normal);
-        Debug.Log(normal2);
+        SendPlaneData(plane);
+       // OnDrawGizmos();
     }
 
-     void OnDrawGizmos()
+    public void SendPlaneData(Plane plane)
+    {
+        laserInput.GetPlaneData(plane);
+    }
+
+    /*void OnDrawGizmos()
     {
         //plane = new Plane(normal, currentTargetPos);
 
@@ -254,7 +259,7 @@ public class TargetSpawn : MonoBehaviour
             Gizmos.DrawLine(new Vector3(-10, i, 0), new Vector3(10, i, 0));
         }
         Gizmos.matrix = matrix;
-    }
+    }*/
 
     private void Differentiate(List<KeyValuePair<float, float>> list)
     {

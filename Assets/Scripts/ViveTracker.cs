@@ -79,6 +79,9 @@ public class ViveTracker : MonoBehaviour
 
     private int currentTargetCount;
 
+    private Vector3 currentRayPos;
+    private Vector3 lastRayPos;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -103,6 +106,9 @@ public class ViveTracker : MonoBehaviour
     {
         TrackMovement();
         rot = transform.rotation;
+
+        Debug.Log("Last: " + lastRayPos);
+        Debug.Log("Current: " + currentRayPos);
     }
 
     public void TrackMovement()
@@ -126,6 +132,12 @@ public class ViveTracker : MonoBehaviour
         
         currentTargetPos2 = currentTarget;
         previousTargetPos2 = previousTarget;
+    }
+
+    public void HandleRayData(Vector3 currentRayPos, Vector3 lastRayPos)
+    {
+        this.currentRayPos = currentRayPos;
+        this.lastRayPos = lastRayPos;
     }
 
     private void CheckDistanceToTargets()
