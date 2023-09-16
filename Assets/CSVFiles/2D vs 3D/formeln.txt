@@ -1,5 +1,0 @@
-=WURZEL(SUMMEXMY2(J5:L5; J4:L4))	in N5
-
-=WENN(F6>=F5; N5+N6; N5-N6)		in P6
-
-=WENN(F6>=F5; P6+N7; P6-N7)		in P7

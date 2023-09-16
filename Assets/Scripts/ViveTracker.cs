@@ -10,7 +10,8 @@ public class ViveTracker : MonoBehaviour
     public List<decimal> distanceToPrevPos = new();
 
     public List<string> cameraPos = new();
-    public List<Quaternion> controllerRot = new();
+    //public List<Quaternion> controllerRot = new();
+    public List<Vector3> controllerRot = new();
 
     public List<decimal> distanceToLastTarget = new();
     public List<float> distanceToCurrentTarget = new();
@@ -45,7 +46,8 @@ public class ViveTracker : MonoBehaviour
     private Vector3 currentPos;
     private Vector2 currentPos2;
 
-    private Quaternion rot;
+    //private Quaternion rot;
+    private Vector3 rot;
 
     private bool goingForward;
     private bool goingForward2;
@@ -75,7 +77,7 @@ public class ViveTracker : MonoBehaviour
     {
         lastPos = transform.position;
         lastPos2 = transform.position;
-        rot = transform.rotation;
+        rot = transform.rotation.eulerAngles;
 
        // totalDistance = 0;
        // totalDistance2 = 0;
@@ -92,7 +94,6 @@ public class ViveTracker : MonoBehaviour
     void FixedUpdate()
     {
         TrackMovement();
-        rot = transform.rotation;
     }
 
     public void TrackMovement()
@@ -107,6 +108,7 @@ public class ViveTracker : MonoBehaviour
         
         lastPos = currentPos;
         lastPos2 = currentPos2;
+        rot = transform.rotation.eulerAngles;
     }
 
     public void HandlePositionData(Vector3 currentTarget, Vector3 previousTarget)

@@ -33,7 +33,7 @@ public class Plotter : MonoBehaviour
         }
     }
 
-    public void WriteCSV(List<KeyValuePair<float, /*float*/decimal>> dataList, List<decimal> distanceToPrevPos, List<string> controllerPos, List<Quaternion> rotation, List<string> cameraPos, List<decimal> distanceToLastTarget, List<float> distanceToCurrentTarget, string previousTarget, string currentTarget,/* string previousTarget, string currentTarget,*/ List<float> vectorX, List<float> vectorY, List<float> vectorZ)
+    public void WriteCSV(List<KeyValuePair<float, /*float*/decimal>> dataList, List<decimal> distanceToPrevPos, List<string> controllerPos, List<Vector3> rotation, List<string> cameraPos, List<decimal> distanceToLastTarget, List<float> distanceToCurrentTarget, string previousTarget, string currentTarget,/* string previousTarget, string currentTarget,*/ List<float> vectorX, List<float> vectorY, List<float> vectorZ)
     {
        // System.IO.Directory.CreateDirectory(directoryName);
         TextWriter writer = new StreamWriter(fileName, true);
@@ -48,7 +48,7 @@ public class Plotter : MonoBehaviour
         writer.Close();
     }
 
-    public void WriteRayCSV(List<KeyValuePair<float, decimal>> dataList, List<decimal> rayDistanceToPrevPos, List<string> rayPos, List<string> cameraPos, List<decimal> rayDistanceToLastTarget, List<float> rayDistanceToCurrentTarget, string previousTarget, string currentTarget)
+    public void WriteRayCSV(List<KeyValuePair<float, decimal>> dataList, List<decimal> rayDistanceToPrevPos, List<string> rayPos, List<string> cameraPos, List<decimal> rayDistanceToLastTarget, List<float> rayDistanceToCurrentTarget, string previousTarget, string currentTarget, List<KeyValuePair<float, decimal>> dataList2, List<decimal> rayDistanceToPrevPos2, List<string> rayPos2, List<decimal> rayDistanceToLastTarget2, List<float> rayDistanceToCurrentTarget2, List<float> vectorX, List<float> vectorY, List<float> vectorZ)
     {
         TextWriter writer = new StreamWriter(fileNameRay, true);
         writer.WriteLine(previousTarget + ";" + currentTarget);
@@ -56,7 +56,7 @@ public class Plotter : MonoBehaviour
 
         for (int i = 0; i < dataList.Count; i++)
         {
-            writer.WriteLine(dataList[i].Key + ";" + dataList[i].Value + ";" + rayDistanceToPrevPos[i] + ";" + rayPos[i] + ";" + cameraPos[i] + ";" + rayDistanceToLastTarget[i] + ";" + rayDistanceToCurrentTarget[i]);
+            writer.WriteLine(dataList[i].Key + ";" + dataList[i].Value + ";" + rayDistanceToPrevPos[i] + ";" + rayPos[i] + ";" + cameraPos[i] + ";" + rayDistanceToLastTarget[i] + ";" + rayDistanceToCurrentTarget[i] + ";;;" + dataList2[i].Key + ";" + dataList2[i].Value + ";" + rayDistanceToPrevPos2[i] + ";" + rayPos2[i] + ";" + rayDistanceToLastTarget2[i] + ";" + rayDistanceToCurrentTarget2[i] + ";" + ";" + ";" + vectorX[i] + ";" + vectorY[i] + ";" + vectorZ[i]);
         }
 
         writer.Close();
@@ -93,7 +93,7 @@ public class Plotter : MonoBehaviour
     private void WriteRayHeader()
     {
         TextWriter writer = new StreamWriter(fileNameRay, true);
-        writer.WriteLine("time;total distance traveled;distance to prev position;ray position;camera position;distance to prev target;distance to current target");
+        writer.WriteLine("time;total distance traveled;distance to prev position;ray position;camera position;distance to prev target;distance to current target;;;time;total distance traveled;distance to prev position;ray position;distance to prev target;distance to current target");
         writer.Close();
     }
 }
