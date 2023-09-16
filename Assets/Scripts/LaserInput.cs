@@ -68,40 +68,6 @@ public class LaserInput : MonoBehaviour
         rayDistanceToCurrTarget2 = Vector2.Distance(currentTargetPos2, lastRayPos2);
     }
 
-    // Update is called once per frame
-   /* void FixedUpdate()
-    {
-      if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 100.0f))
-      {
-            Ray ray = new Ray(transform.position, transform.forward);
-            float enter = 0.0f;
-            if (plane.Raycast(ray, out enter))
-            {
-                Vector3 hitPoint = ray.GetPoint(enter);
-                currentRayPos = hitPoint;
-                SendRayData(currentRayPos, lastRayPos);
-                lastRayPos = currentRayPos;
-                //Debug.Log(hitPoint);
-            }
-            if (hit.collider.gameObject.CompareTag("Target"))
-            {
-                currentObject = hit.collider.gameObject;
-                currentObject.GetComponent<MeshRenderer>().material = activatedMaterial;
-                countdown -= Time.deltaTime;
-                if (countdown < 0)
-                {
-                    Destroy(currentObject);
-                    ResetCountdown();
-                }
-            }
-            else
-            {
-                ResetCountdown();
-                if (currentObject != null) currentObject.GetComponent<MeshRenderer>().material = defaultMaterial;
-            }
-      }
-    }*/
-
     void FixedUpdate()
     {
         Ray ray = new Ray(transform.position, transform.forward);
@@ -117,10 +83,8 @@ public class LaserInput : MonoBehaviour
                 CheckDistanceToTargets();
                 CalculateDistance();
                // cube.transform.position = hitPoint;
-                //SendRayData(currentRayPos, lastRayPos);
                 lastRayPos = currentRayPos;
                 lastRayPos2 = currentRayPos2;
-                //Debug.Log(hitPoint);
             }
             if (hit.collider.gameObject.CompareTag("Target"))
             {
@@ -144,13 +108,7 @@ public class LaserInput : MonoBehaviour
     public void GetPlaneData(Plane plane)
     {
         this.plane = plane;
-      //  Debug.Log("Sent Plane Data");
     }
-
-   /* public void SendRayData(Vector3 currentRayPos, Vector3 lastRayPos)
-    {
-        viveTracker.HandleRayData(currentRayPos, lastRayPos);
-    }*/
 
     public void HandlePositionData(Vector3 currentTarget, Vector3 previousTarget)
     {
@@ -195,8 +153,6 @@ public class LaserInput : MonoBehaviour
         decimal distance = (decimal)Vector3.Distance(currentRayPos, lastRayPos);
         decimal distance2 = (decimal)Vector2.Distance(currentRayPos2, lastRayPos2);
 
-        //  distanceToPrevTarget = (currentPos - previousTargetPos).magnitude;
-
         if (goingForward)
         {
             totalDistance += distance;
@@ -219,14 +175,12 @@ public class LaserInput : MonoBehaviour
         rayPos.Add(currentRayPos.ToString("F9"));
         rayDistanceToPrevPos.Add(distance);
         cameraPos.Add(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position.ToString("F9"));
-        // distanceToLastTarget.Add(distanceToPrevTarget.ToString("F4"));
         rayDistanceToLastTarget.Add(prevRayDistance);
         rayDistanceToCurrentTarget.Add(rayDistanceToCurrTarget);
 
         trackingData2.Add(new KeyValuePair<float, decimal>(Timer.timer, totalDistance2));
         rayPos2.Add(currentRayPos2.ToString("F9"));
         rayDistanceToPrevPos2.Add(distance2);
-        // distanceToLastTarget.Add(distanceToPrevTarget.ToString("F4"));
         rayDistanceToLastTarget2.Add(prevRayDistance2);
         rayDistanceToCurrentTarget2.Add(rayDistanceToCurrTarget2);
 

@@ -16,9 +16,7 @@ public class TargetSpawn : MonoBehaviour
     public int playerId;
     public string weightLevel;
 
-    //!
     public Vector3 previousTargetPos;
-    // !!
     public Vector3 normal;
     public Vector3 currentTargetPos;
 
@@ -26,52 +24,66 @@ public class TargetSpawn : MonoBehaviour
     [SerializeField] Text display;
 
     private GameObject currentTarget;
-    private GameObject currentPlane;
-    
     private Vector3 cameraPos;
     private Plane plane;
 
-    private int currentTargetCount = 0;
-
-    private float totalTime = 0;
-
     private CSVWriter csvWriter;
     private Plotter plotter;
-    private Tracker tracker;
     private ViveTracker viveTracker;
     private LaserInput laserInput;
-    private GameObject weight;
 
-    float distanceToPlayer;
-    float distanceToPrevTarget;
-
-   
+    private int currentTargetCount = 0;
+    private float totalTime = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         plane = new Plane(Vector3.Cross(cameraPos, currentTargetPos - previousTargetPos), currentTargetPos);
-     //   laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
+        laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
+        viveTracker = transform.parent.Find("ViveTracker").GetComponent<ViveTracker>();
         SpawnFirstTarget();
         csvWriter = new CSVWriter(playerId);
-        //weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
-        //tracker = weight.transform.Find("TrackPoint").GetComponent<Tracker>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         if (Timer.keepTiming) Timer.UpdateTimer();
-        if (weight == null) weight = GameObject.FindGameObjectsWithTag("Dumbbell")[0];
-        if (viveTracker == null) viveTracker = transform.parent.Find("ViveTracker").GetComponent<ViveTracker>();
-        if (laserInput == null) laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
+        //if (viveTracker == null) viveTracker = transform.parent.Find("ViveTracker").GetComponent<ViveTracker>();
+        //if (laserInput == null) laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
     }
 
-    public Vector3 ComputeTargetCenter()
+    public void OnTargetDestroyed()
+    {
+        currentTargetCount++;
+        PlayerData playerData = new PlayerData(playerId, weightLevel, Timer.timer);
+        totalTime += Timer.timer;
+        Timer.StopTimer();
+        plotter = new Plotter(playerId, currentTargetCount);
+        plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
+        plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), laserInput.trackingData2, laserInput.rayDistanceToPrevPos2, laserInput.rayPos2, laserInput.rayDistanceToLastTarget2, laserInput.rayDistanceToCurrentTarget2, laserInput.vectorX, laserInput.vectorY, laserInput.vectorZ);
+        ClearTrackingData();
+        laserInput.totalDistance = 0;
+        laserInput.totalDistance2 = 0;
+        viveTracker.totalDistance = 0;
+        csvWriter.WriteCSV(playerData);
+        SendPositionData();
+        previousTargetPos = currentTargetPos;
+
+        if (currentTargetCount < maxTargetCount) SpawnNextTarget();
+        else if (currentTargetCount == maxTargetCount) display.text = "DONE! \n" + "Total Time: " + totalTime.ToString("n2") + " seconds \n\n" + "Borg scale";
+    }
+
+    public void SendPositionData()
+    {
+        viveTracker.HandlePositionData(currentTargetPos, previousTargetPos);
+        laserInput.HandlePositionData(currentTargetPos, previousTargetPos);
+    }
+    private Vector3 ComputeTargetCenter()
     {
         float distance = Mathf.Abs(Vector3.Distance(currentTargetPos, cameraPos));
 
-        float scalingOnC1C2 = 0.5f + (radiusPlayerDome * radiusPlayerDome - radiusTargetSafeSpace * radiusTargetSafeSpace) / (2f * distance * distance); 
+        float scalingOnC1C2 = 0.5f + (radiusPlayerDome * radiusPlayerDome - radiusTargetSafeSpace * radiusTargetSafeSpace) / (2f * distance * distance);
 
         Vector3 intersectionCircleCenter = cameraPos + scalingOnC1C2 * (currentTargetPos - cameraPos); // Center of the cirlce of the intersection between radiusPlayerDome and radiusTargetSafeSpace
 
@@ -101,51 +113,16 @@ public class TargetSpawn : MonoBehaviour
             randomAngle = UnityEngine.Random.Range(0.0f, 1.0f) * 2.0f * Mathf.PI;
             nextTargetCenter = intersectionCircleCenter + intersectionCircleRadius * (t_i * Mathf.Cos(randomAngle) + b_i * Mathf.Sin(randomAngle));
         }
-        distanceToPlayer = Mathf.Abs(Vector3.Distance(nextTargetCenter, cameraPos));
-        distanceToPrevTarget = Mathf.Abs(Vector3.Distance(nextTargetCenter, currentTargetPos));
 
         return nextTargetCenter;
     }
 
-    public static void SphericalToCartesian(float radius, float elevation, float polar, out Vector3 outCart)
+    private void SphericalToCartesian(float radius, float elevation, float polar, out Vector3 outCart)
     {
         float a = radius * Mathf.Cos(elevation);
         outCart.x = a * Mathf.Cos(polar);
         outCart.y = radius * Mathf.Sin(elevation);
         outCart.z = a * Mathf.Sin(polar);
-    }
-
-    public void OnTargetDestroyed()
-    {
-        currentTargetCount++;
-        PlayerData playerData = new PlayerData(playerId, weightLevel, Timer.timer);
-        totalTime += Timer.timer;
-        Timer.StopTimer();
-        plotter = new Plotter(playerId, currentTargetCount);
-        plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
-        // plotter.WriteCSV2(viveTracker.trackingData2, viveTracker.distanceToPrevPos2, viveTracker.controllerPos2, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget2, viveTracker.distanceToCurrentTarget2, previousTargetPos, currentTargetPos, viveTracker.vectorX2, viveTracker.vectorY2);
-        plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), laserInput.trackingData2, laserInput.rayDistanceToPrevPos2, laserInput.rayPos2, laserInput.rayDistanceToLastTarget2, laserInput.rayDistanceToCurrentTarget2, laserInput.vectorX, laserInput.vectorY, laserInput.vectorZ);
-        // Differentiate(viveTracker.trackingData);
-        //  Differentiate2(viveTracker.trackingData);
-        ClearTrackingData();
-        //ClearTrackingData2();
-        ClearRayTrackingData();
-        laserInput.totalDistance = 0;
-        laserInput.totalDistance2 = 0;
-        viveTracker.totalDistance = 0;
-        //  viveTracker.totalDistance2 = 0;
-        csvWriter.WriteCSV(playerData);
-        SendPositionData();
-        previousTargetPos = currentTargetPos;
-
-        if (currentTargetCount < maxTargetCount) SpawnNextTarget();
-        else if (currentTargetCount == maxTargetCount) display.text = "DONE \n" + "Total Time: " + totalTime.ToString("n2") + " seconds";
-    }
-
-    public void SendPositionData()
-    {
-        viveTracker.HandlePositionData(currentTargetPos, previousTargetPos);
-        laserInput.HandlePositionData(currentTargetPos, previousTargetPos);
     }
 
     private void ClearTrackingData()
@@ -160,22 +137,7 @@ public class TargetSpawn : MonoBehaviour
         viveTracker.vectorZ.Clear();
         viveTracker.distanceToLastTarget.Clear();
         viveTracker.distanceToCurrentTarget.Clear();
-    }
 
-    private void ClearTrackingData2()
-    {
-        viveTracker.trackingData2.Clear();
-        viveTracker.controllerPos2.Clear();
-        viveTracker.controllerRot.Clear();
-        viveTracker.distanceToPrevPos2.Clear();
-        viveTracker.vectorX2.Clear();
-        viveTracker.vectorY2.Clear();
-        viveTracker.distanceToLastTarget2.Clear();
-        viveTracker.distanceToCurrentTarget2.Clear();
-    }
-
-    private void ClearRayTrackingData()
-    {
         laserInput.trackingData.Clear();
         laserInput.rayPos.Clear();
         laserInput.cameraPos.Clear();
@@ -201,11 +163,8 @@ public class TargetSpawn : MonoBehaviour
         currentTarget.transform.position = currentTarget.transform.position + firstTargetVector;
         currentTargetPos = currentTarget.transform.position;
         previousTargetPos = currentTargetPos;
-       // currentPlane = Instantiate(planePrefab, new Vector3(0, 0, 0), transform.rotation);
 
         cameraPos = transform.position;
-        distanceToPlayer = Mathf.Abs(Vector3.Distance(currentTarget.transform.position, cameraPos));
-        distanceToPrevTarget = 0;
 
         Timer.StartTimer();
     }
@@ -218,9 +177,6 @@ public class TargetSpawn : MonoBehaviour
         cameraPos = transform.position;
         currentTargetPos = currentTarget.transform.position;
         CreatePlane();
-        // currentPlane.transform.position = currentTargetPos;
-        // currentPlane.transform.rotation = Quaternion.LookRotation(new Vector3(0, 0, previousTargetPos.y));
-
         SendPositionData();
 
         Timer.StartTimer();
@@ -282,92 +238,4 @@ public class TargetSpawn : MonoBehaviour
         }
         Gizmos.matrix = matrix;
     }*/
-
-    private void Differentiate(List<KeyValuePair<float, float>> list)
-    {
-        int scale = 100;
-        List<KeyValuePair<float, float>> vList = new();
-
-        for (int i = 1; i < list.Count; i++)
-        {
-            float key;
-            float value;
-
-            key = list[i].Key;
-            value = (list[i].Value - list[i - 1].Value) / scale;
-
-            vList.Add(new KeyValuePair<float, float>(key, value));
-        }
-
-        string fileName = Application.dataPath + "/CSVFiles/VELOCITY" + playerId + "_"+ currentTargetCount + ".csv";
-        TextWriter writer = new StreamWriter(fileName, true);
-        writer.WriteLine("time;velocity");
-        foreach (var item in vList)
-        {
-            writer.WriteLine(item.Key + ";" + item.Value);
-        }
-        writer.Close();
-    }
-
-    private void Differentiate2(List<KeyValuePair<float, float>> list)
-    {
-        int scale = 100;
-        List<KeyValuePair<float, float>> vList = new();
-        List<KeyValuePair<float, float>> aList = new();
-
-        for (int i = 1; i < list.Count; i++)
-        {
-            float key;
-            float value;
-
-            key = list[i].Key;
-            value = (list[i].Value - list[i - 1].Value) / scale;
-
-            vList.Add(new KeyValuePair<float, float>(key, value));
-        }
-
-        for (int i = 1; i < vList.Count; i++)
-        {
-            float key;
-            float value;
-
-            key = vList[i].Key;
-            value = (vList[i].Value - vList[i - 1].Value) / scale;
-
-            aList.Add(new KeyValuePair<float, float>(key, value));
-        }
-
-        string fileName = Application.dataPath + "/CSVFiles/ACCELERATION" + playerId + "_" + currentTargetCount + ".csv";
-        TextWriter writer = new StreamWriter(fileName, true);
-        writer.WriteLine("time;acceleration");
-        foreach (var item in aList)
-        {
-            writer.WriteLine(item.Key + ";" + item.Value);
-        }
-        writer.Close();
-    }
-
-    private void DifferentiateTest()
-    {
-        List<KeyValuePair<float, float>> vList = new();
-
-        for (int i = 1; i < 100; i++)
-        {
-            float key;
-            float value;
-
-            key = i;
-            value = (float) (Math.Sin(i) - Math.Sin(i-1)) / 100;
-
-            vList.Add(new KeyValuePair<float, float>(key, value));
-        }
-        string fileName = Application.dataPath + "/CSVFiles/VELOCITYTEST" + currentTargetCount + ".csv";
-        TextWriter writer = new StreamWriter(fileName, true);
-        writer.WriteLine("time;velocity");
-        foreach (var item in vList)
-        {
-            writer.WriteLine(item.Key + ";" + item.Value);
-        }
-        writer.Close();
-    }
 }

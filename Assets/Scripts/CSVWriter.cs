@@ -12,10 +12,7 @@ public class CSVWriter : MonoBehaviour
     {
         id = playerId;
         fileName = Application.dataPath + "/CSVFiles/Player_" + id + ".csv";
-        if (!File.Exists(fileName))
-        {
-            WriteHeader();
-        }
+        if (!File.Exists(fileName)) WriteHeader();
     }
 
     public void WriteCSV(PlayerData playerData)

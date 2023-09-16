@@ -7,30 +7,21 @@ public class WeightManager : MonoBehaviour
     public enum WeightLevel
     {
         light,
-        mediumLight,
-        mediumHeavy,
+        medium,
         heavy
     }
 
     public WeightLevel level = new WeightLevel();
 
-    private GameObject weightLight, weightMediumLight, weightMediumHeavy, weightHeavy;
+    private GameObject weightLight, weightMedium, weightHeavy;
 
     public void Start()
     {
-       // weightLight = GameObject.Find("ContainerPlastic");
-        //weightLight = GameObject.Find("ContainerLight");
-        weightLight = GameObject.Find("ContainerBamboo");
-        //weightLight = GameObject.Find("ContainerMetalBar");
-       // weightLight = GameObject.Find("ContainerWoodenPole");
-        weightMediumLight = GameObject.Find("Container1Weight");
-       // weightMediumLight = GameObject.Find("ContainerMedium");
-        weightMediumHeavy = GameObject.Find("Container4Weight");
-        //weightMediumHeavy = GameObject.Find("ContainerMedium2");
-        weightHeavy = GameObject.Find("Container5Weight");
-        //weightHeavy = GameObject.Find("ContainerVeryHeavy");
+        weightLight = GameObject.Find("ContainerLight");
+        weightMedium = GameObject.Find("ContainerMedium");
+        weightHeavy = GameObject.Find("ContainerHeavy");
 
-        GameObject[] weightList = { weightLight, weightMediumLight, weightMediumHeavy, weightHeavy };
+        GameObject[] weightList = { weightLight, weightMedium, weightHeavy };
 
         switch (level)
         {
@@ -43,21 +34,12 @@ public class WeightManager : MonoBehaviour
                 }
                 break;
 
-            case WeightLevel.mediumLight:
-                weightMediumLight.tag = "Dumbbell";
-                weightMediumLight.SetActive(true);
+            case WeightLevel.medium:
+                weightMedium.tag = "Dumbbell";
+                weightMedium.SetActive(true);
                 foreach (GameObject weight in weightList)
                 {
-                    if (weight != weightMediumLight) weight.SetActive(false);
-                }
-                break;
-
-            case WeightLevel.mediumHeavy:
-                weightMediumHeavy.tag = "Dumbbell";
-                weightMediumHeavy.SetActive(true);
-                foreach (GameObject weight in weightList)
-                {
-                    if (weight != weightMediumHeavy) weight.SetActive(false);
+                    if (weight != weightMedium) weight.SetActive(false);
                 }
                 break;
 
