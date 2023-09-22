@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class LaserInput : MonoBehaviour
 {
     [SerializeField] GameObject cube;
+    [SerializeField] TMPro.TextMeshProUGUI speedTest;
+    [SerializeField] public Material activatedMaterial;
+    [SerializeField] Material defaultMaterial;
 
     public static GameObject currentObject;
     public List<KeyValuePair<float, decimal>> trackingData = new();
@@ -21,8 +25,11 @@ public class LaserInput : MonoBehaviour
     public decimal totalDistance = 0;
     public decimal totalDistance2 = 0;
 
-    public Material activatedMaterial;
-    public Material defaultMaterial;
+    public float reactionTime;
+    public float reactionTimeDistance;
+
+    // public Material activatedMaterial;
+    // public Material defaultMaterial;
 
     private const float DestructionTime = 0.2f;
 
@@ -46,11 +53,30 @@ public class LaserInput : MonoBehaviour
     private bool goingForward;
     private bool goingForward2;
 
+    private float maxReactionTime = 0.6f;
+    private float currentReactionTime = 0;
+    public float startReactionTime = 0;
+    public float startReactionTimeDistance = 0;
+    private float maxReactionSpeed = 0.6f;
+    private decimal maxReactionDistance = 0.1m;
+    private decimal currentReactionDistance = 0;
+
     public List<KeyValuePair<float, decimal>> trackingData2 = new();
     public List<string> rayPos2 = new();
     public List<decimal> rayDistanceToPrevPos2 = new();
     public List<decimal> rayDistanceToLastTarget2 = new();
     public List<float> rayDistanceToCurrentTarget2 = new();
+
+    public bool trackedReactionTime = false;
+    public bool movementStarted = false;
+    public bool movementStartedDistance = false;
+    public bool trackedReactionTimeDistance = false;
+    public float maxSpeed = 0;
+    public int frames = 0;
+    private int maxFrames = 30;
+    private decimal distanceThreshold = 0.009m; //try 0.01 again
+    private int tolerance = 2;
+    private int currentTolerance = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -70,6 +96,9 @@ public class LaserInput : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!trackedReactionTime) reactionTime += Time.deltaTime;
+        if (!trackedReactionTimeDistance) reactionTimeDistance += Time.deltaTime;
+
         Ray ray = new Ray(transform.position, transform.forward);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
@@ -82,7 +111,9 @@ public class LaserInput : MonoBehaviour
                 currentRayPos2 = hitPoint2;
                 CheckDistanceToTargets();
                 CalculateDistance();
-               // cube.transform.position = hitPoint;
+                // cube.transform.position = hitPoint;
+              //  CalculateReactionTime();
+                
                 lastRayPos = currentRayPos;
                 lastRayPos2 = currentRayPos2;
             }
@@ -119,6 +150,89 @@ public class LaserInput : MonoBehaviour
         previousTargetPos2 = previousTarget;
     }
 
+    private void CalculateReactionTime()
+    {
+        float speed = Vector3.Distance(lastRayPos, currentRayPos) / Time.deltaTime;
+
+        if (speed > maxSpeed) maxSpeed = speed;
+
+        speedTest.text = "SPEED: " + speed.ToString("F2");
+
+        if (!trackedReactionTime)
+        {
+            if (speed >= maxReactionSpeed)
+            {
+                if (!movementStarted)
+                {
+                    startReactionTime = reactionTime;
+                    movementStarted = true;
+                }
+                currentReactionTime += Time.deltaTime;
+                if (currentReactionTime >= maxReactionTime)
+                {
+                    trackedReactionTime = true;
+                    //reactionTime = startReactionTime;
+                }
+            }
+            else
+            {
+                currentReactionTime = 0;
+                startReactionTime = 0;
+                movementStarted = false;
+            }
+        }
+
+        /*if (!trackedReactionTimeDistance)
+        {
+            currentReactionDistance += (decimal)Vector3.Distance(lastRayPos, currentRayPos);
+            if (currentReactionDistance >= maxReactionDistance)
+            {
+                trackedReactionTimeDistance = true;
+            }
+        }*/
+        if (!trackedReactionTimeDistance)
+        {
+            if (frames < maxFrames)
+            {
+                if ((decimal)Vector3.Distance(lastRayPos, currentRayPos) >= distanceThreshold)
+                {
+                    frames++;
+                    if (!movementStartedDistance)
+                    {
+                        startReactionTimeDistance = reactionTimeDistance;
+                        movementStartedDistance = true;
+                    }
+                }
+                else
+                {
+                    if (currentTolerance < tolerance)
+                    {
+                        currentTolerance++;
+                        frames++;
+                        if (!movementStartedDistance)
+                        {
+                            startReactionTimeDistance = reactionTimeDistance;
+                            movementStartedDistance = true;
+                        }
+                    }
+                    else if (currentTolerance >= tolerance)
+                    {
+                        frames = 0;
+                        movementStartedDistance = false;
+                        startReactionTimeDistance = 0;
+                        currentTolerance = 0;
+                    }
+                }
+            }
+            else if (frames >= maxFrames)
+            {
+                trackedReactionTimeDistance = true;
+                currentTolerance = 0;
+            }
+        }
+
+    }
+
     private void CheckDistanceToTargets()
     {
         currentRayDistance = (decimal)Vector3.Distance(previousTargetPos, currentRayPos);
@@ -127,6 +241,7 @@ public class LaserInput : MonoBehaviour
         if (prevRayDistance <= currentRayDistance)
         {
             goingForward = true;
+            //CalculateReactionTime();
         }
         else if (prevRayDistance > currentRayDistance)
         {
@@ -155,6 +270,7 @@ public class LaserInput : MonoBehaviour
 
         if (goingForward)
         {
+            CalculateReactionTime();
             totalDistance += distance;
         }
         else if (!goingForward)

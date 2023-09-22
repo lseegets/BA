@@ -7,21 +7,27 @@ using System;
 
 public class TargetSpawn : MonoBehaviour
 {
-    private const float radiusPlayerDome = 5f;
-    private const float radiusTargetSafeSpace = 2f;
-    const float startElevation = 0.25f * Mathf.PI;
-    const float startPolar = 0.5f * Mathf.PI;
-
-    public int maxTargetCount;
     public int playerId;
-    public string weightLevel;
 
     public Vector3 previousTargetPos;
     public Vector3 normal;
     public Vector3 currentTargetPos;
+    public enum Mode
+    {
+        testRun,
+        serious
+    }
+    public Mode mode = new();
 
-    [SerializeField] GameObject target, planePrefab;
+    [SerializeField] GameObject target;
     [SerializeField] Text display;
+
+    private const float radiusPlayerDome = 5f;
+    private const float radiusTargetSafeSpace = 2f;
+    private const float startElevation = 0.25f * Mathf.PI;
+    private const float startPolar = 0.5f * Mathf.PI;
+    private const int testRunTargetCount = 25;
+    private const int seriousTargetCount = 51;
 
     private GameObject currentTarget;
     private Vector3 cameraPos;
@@ -33,16 +39,30 @@ public class TargetSpawn : MonoBehaviour
     private LaserInput laserInput;
 
     private int currentTargetCount = 0;
+    private int maxTargetCount;
     private float totalTime = 0;
+
+    private WeightManager.WeightLevel weightLevel;
 
     // Start is called before the first frame update
     void Start()
     {
+        switch (mode)
+        {
+            case Mode.testRun:
+                maxTargetCount = testRunTargetCount;
+                break;
+            case Mode.serious:
+                maxTargetCount = seriousTargetCount;
+                break;
+        }
+
         plane = new Plane(Vector3.Cross(cameraPos, currentTargetPos - previousTargetPos), currentTargetPos);
-        laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
+       // laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
         viveTracker = transform.parent.Find("ViveTracker").GetComponent<ViveTracker>();
         SpawnFirstTarget();
         csvWriter = new CSVWriter(playerId);
+        display.text = "Point at the target to start";
     }
 
     // Update is called once per frame
@@ -50,18 +70,18 @@ public class TargetSpawn : MonoBehaviour
     {
         if (Timer.keepTiming) Timer.UpdateTimer();
         //if (viveTracker == null) viveTracker = transform.parent.Find("ViveTracker").GetComponent<ViveTracker>();
-        //if (laserInput == null) laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
+        if (laserInput == null) laserInput = GameObject.FindGameObjectsWithTag("Dumbbell")[0].GetComponentInChildren<LaserInput>();
     }
 
     public void OnTargetDestroyed()
     {
         currentTargetCount++;
-        PlayerData playerData = new PlayerData(playerId, weightLevel, Timer.timer);
+        PlayerData playerData = new PlayerData(playerId, currentTargetCount, weightLevel, Timer.timer, laserInput.maxSpeed);
         totalTime += Timer.timer;
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
         plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
-        plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), laserInput.trackingData2, laserInput.rayDistanceToPrevPos2, laserInput.rayPos2, laserInput.rayDistanceToLastTarget2, laserInput.rayDistanceToCurrentTarget2, laserInput.vectorX, laserInput.vectorY, laserInput.vectorZ);
+        plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), laserInput.startReactionTime, laserInput.startReactionTimeDistance, laserInput.trackingData2, laserInput.rayDistanceToPrevPos2, laserInput.rayPos2, laserInput.rayDistanceToLastTarget2, laserInput.rayDistanceToCurrentTarget2, laserInput.vectorX, laserInput.vectorY, laserInput.vectorZ);
         ClearTrackingData();
         laserInput.totalDistance = 0;
         laserInput.totalDistance2 = 0;
@@ -70,7 +90,11 @@ public class TargetSpawn : MonoBehaviour
         SendPositionData();
         previousTargetPos = currentTargetPos;
 
-        if (currentTargetCount < maxTargetCount) SpawnNextTarget();
+        if (currentTargetCount < maxTargetCount)
+        {
+            display.text = "";
+            SpawnNextTarget();
+        }
         else if (currentTargetCount == maxTargetCount) display.text = "DONE! \n" + "Total Time: " + totalTime.ToString("n2") + " seconds \n\n\n" +
         "What level of exertion did you experience on a scale of \n\n 6 (no exertion/relaxed) to 20 (maximal exertion)?";
     }
@@ -79,6 +103,11 @@ public class TargetSpawn : MonoBehaviour
     {
         viveTracker.HandlePositionData(currentTargetPos, previousTargetPos);
         laserInput.HandlePositionData(currentTargetPos, previousTargetPos);
+    }
+
+    public void GetWeightData(WeightManager.WeightLevel level)
+    {
+        weightLevel = level;
     }
     private Vector3 ComputeTargetCenter()
     {
@@ -148,6 +177,16 @@ public class TargetSpawn : MonoBehaviour
         laserInput.vectorX.Clear();
         laserInput.vectorY.Clear();
         laserInput.vectorZ.Clear();
+        laserInput.reactionTime = 0;
+        laserInput.startReactionTime = 0;
+        laserInput.startReactionTimeDistance = 0;
+        laserInput.reactionTimeDistance = 0;
+        laserInput.trackedReactionTime = false;
+        laserInput.trackedReactionTimeDistance = false;
+        laserInput.movementStarted = false;
+        laserInput.movementStartedDistance = false;
+        laserInput.maxSpeed = 0;
+        laserInput.frames = 0;
 
         laserInput.trackingData2.Clear();
         laserInput.rayPos2.Clear();

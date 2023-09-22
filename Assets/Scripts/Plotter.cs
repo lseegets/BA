@@ -35,10 +35,10 @@ public class Plotter : MonoBehaviour
         writer.Close();
     }
 
-    public void WriteRayCSV(List<KeyValuePair<float, decimal>> dataList, List<decimal> rayDistanceToPrevPos, List<string> rayPos, List<string> cameraPos, List<decimal> rayDistanceToLastTarget, List<float> rayDistanceToCurrentTarget, string previousTarget, string currentTarget, List<KeyValuePair<float, decimal>> dataList2, List<decimal> rayDistanceToPrevPos2, List<string> rayPos2, List<decimal> rayDistanceToLastTarget2, List<float> rayDistanceToCurrentTarget2, List<float> vectorX, List<float> vectorY, List<float> vectorZ)
+    public void WriteRayCSV(List<KeyValuePair<float, decimal>> dataList, List<decimal> rayDistanceToPrevPos, List<string> rayPos, List<string> cameraPos, List<decimal> rayDistanceToLastTarget, List<float> rayDistanceToCurrentTarget, string previousTarget, string currentTarget, float reactionTime, float reactionTimeDistance, List<KeyValuePair<float, decimal>> dataList2, List<decimal> rayDistanceToPrevPos2, List<string> rayPos2, List<decimal> rayDistanceToLastTarget2, List<float> rayDistanceToCurrentTarget2, List<float> vectorX, List<float> vectorY, List<float> vectorZ)
     {
         TextWriter writer = new StreamWriter(fileNameRay, true);
-        writer.WriteLine(previousTarget + ";" + currentTarget);
+        writer.WriteLine(previousTarget + ";" + currentTarget + ";" + reactionTime + ";" + reactionTimeDistance);
         writer.WriteLine();
 
         for (int i = 0; i < dataList.Count; i++)

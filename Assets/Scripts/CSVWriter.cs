@@ -18,14 +18,14 @@ public class CSVWriter : MonoBehaviour
     public void WriteCSV(PlayerData playerData)
     {
         TextWriter writer = new StreamWriter(fileName, true);
-        writer.WriteLine(playerData.id + ";" + playerData.level + ";" + playerData.time);
+        writer.WriteLine(playerData.id + ";" + playerData.targetNumber + ";" + playerData.level + ";" + playerData.time + ";" + playerData.speed);
         writer.Close();
     }
 
     private void WriteHeader()
     {
         TextWriter writer = new StreamWriter(fileName, true);
-        writer.WriteLine("id;weight level;time");
+        writer.WriteLine("id;target number;weight level;time;max speed");
         writer.Close();
     }
 }

@@ -14,6 +14,7 @@ public class WeightManager : MonoBehaviour
     public WeightLevel level = new WeightLevel();
 
     private GameObject weightLight, weightMedium, weightHeavy;
+    private TargetSpawn targetSpawn;
 
     public void Start()
     {
@@ -61,6 +62,13 @@ public class WeightManager : MonoBehaviour
                 }
                 break;
         }
+        targetSpawn = transform.GetComponentInParent<TargetSpawn>();
+        SendLevelData(level);
+    }
+
+    private void SendLevelData(WeightLevel level)
+    {
+        targetSpawn.GetWeightData(level);
     }
 
 }
