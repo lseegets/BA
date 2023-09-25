@@ -9,6 +9,7 @@ TagManager:
   - Canvas
   - Dumbbell
   - Tracker
+  - HighlightTrigger
   layers:
   - Default
   - TransparentFX

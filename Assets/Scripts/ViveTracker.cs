@@ -8,6 +8,7 @@ public class ViveTracker : MonoBehaviour
     public List<string> controllerPos = new();
     public List<decimal> distanceToPrevPos = new();
     public List<string> cameraPos = new();
+    public List<string> trackerDistanceToHmd = new();
     public List<Vector3> controllerRot = new();
     public List<decimal> distanceToLastTarget = new();
     public List<float> distanceToCurrentTarget = new();
@@ -96,6 +97,7 @@ public class ViveTracker : MonoBehaviour
         controllerPos.Add(currentPos.ToString("F9"));
         distanceToPrevPos.Add(distance);
         cameraPos.Add(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position.ToString("F9"));
+        trackerDistanceToHmd.Add(Vector3.Distance(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position, currentPos).ToString("F9"));
         controllerRot.Add(rot);
         distanceToLastTarget.Add(prevDistance);
         distanceToCurrentTarget.Add(distanceToCurrTarget);

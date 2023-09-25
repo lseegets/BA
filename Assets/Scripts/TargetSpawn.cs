@@ -26,7 +26,7 @@ public class TargetSpawn : MonoBehaviour
     private const float radiusTargetSafeSpace = 2f;
     private const float startElevation = 0.25f * Mathf.PI;
     private const float startPolar = 0.5f * Mathf.PI;
-    private const int testRunTargetCount = 25;
+    private const int testRunTargetCount = 10;
     private const int seriousTargetCount = 51;
 
     private GameObject currentTarget;
@@ -80,7 +80,7 @@ public class TargetSpawn : MonoBehaviour
         totalTime += Timer.timer;
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
-        plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
+        plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.trackerDistanceToHmd, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
         plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), laserInput.startReactionTime, laserInput.startReactionTimeDistance, laserInput.trackingData2, laserInput.rayDistanceToPrevPos2, laserInput.rayPos2, laserInput.rayDistanceToLastTarget2, laserInput.rayDistanceToCurrentTarget2, laserInput.vectorX, laserInput.vectorY, laserInput.vectorZ);
         ClearTrackingData();
         laserInput.totalDistance = 0;
@@ -161,6 +161,7 @@ public class TargetSpawn : MonoBehaviour
         viveTracker.controllerPos.Clear();
         viveTracker.controllerRot.Clear();
         viveTracker.cameraPos.Clear();
+        viveTracker.trackerDistanceToHmd.Clear();
         viveTracker.distanceToPrevPos.Clear();
         viveTracker.vectorX.Clear();
         viveTracker.vectorY.Clear();

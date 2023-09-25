@@ -6,7 +6,6 @@ using UnityEngine;
 public class LaserInput : MonoBehaviour
 {
     [SerializeField] GameObject cube;
-    [SerializeField] TMPro.TextMeshProUGUI speedTest;
     [SerializeField] public Material activatedMaterial;
     [SerializeField] Material defaultMaterial;
 
@@ -25,8 +24,8 @@ public class LaserInput : MonoBehaviour
     public decimal totalDistance = 0;
     public decimal totalDistance2 = 0;
 
-    public float reactionTime;
-    public float reactionTimeDistance;
+    public float reactionTime = 0;
+    public float reactionTimeDistance = 0;
 
     // public Material activatedMaterial;
     // public Material defaultMaterial;
@@ -58,8 +57,6 @@ public class LaserInput : MonoBehaviour
     public float startReactionTime = 0;
     public float startReactionTimeDistance = 0;
     private float maxReactionSpeed = 0.6f;
-    private decimal maxReactionDistance = 0.1m;
-    private decimal currentReactionDistance = 0;
 
     public List<KeyValuePair<float, decimal>> trackingData2 = new();
     public List<string> rayPos2 = new();
@@ -73,8 +70,8 @@ public class LaserInput : MonoBehaviour
     public bool trackedReactionTimeDistance = false;
     public float maxSpeed = 0;
     public int frames = 0;
-    private int maxFrames = 30;
-    private decimal distanceThreshold = 0.009m; //try 0.01 again
+    private int maxFrames = 20;
+    private decimal distanceThreshold = 0.01m; //try 0.01 again
     private int tolerance = 2;
     private int currentTolerance = 0;
 
@@ -96,7 +93,7 @@ public class LaserInput : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!trackedReactionTime) reactionTime += Time.deltaTime;
+       // if (!trackedReactionTime) reactionTime += Time.deltaTime;
         if (!trackedReactionTimeDistance) reactionTimeDistance += Time.deltaTime;
 
         Ray ray = new Ray(transform.position, transform.forward);
@@ -152,14 +149,9 @@ public class LaserInput : MonoBehaviour
 
     private void CalculateReactionTime()
     {
-        float speed = Vector3.Distance(lastRayPos, currentRayPos) / Time.deltaTime;
-
-        if (speed > maxSpeed) maxSpeed = speed;
-
-        speedTest.text = "SPEED: " + speed.ToString("F2");
-
         if (!trackedReactionTime)
         {
+            float speed = Vector3.Distance(lastRayPos, currentRayPos) / Time.deltaTime;
             if (speed >= maxReactionSpeed)
             {
                 if (!movementStarted)
@@ -182,14 +174,6 @@ public class LaserInput : MonoBehaviour
             }
         }
 
-        /*if (!trackedReactionTimeDistance)
-        {
-            currentReactionDistance += (decimal)Vector3.Distance(lastRayPos, currentRayPos);
-            if (currentReactionDistance >= maxReactionDistance)
-            {
-                trackedReactionTimeDistance = true;
-            }
-        }*/
         if (!trackedReactionTimeDistance)
         {
             if (frames < maxFrames)
@@ -203,19 +187,19 @@ public class LaserInput : MonoBehaviour
                         movementStartedDistance = true;
                     }
                 }
-                else
+                else if ((decimal)Vector3.Distance(lastRayPos, currentRayPos) < distanceThreshold)
                 {
-                    if (currentTolerance < tolerance)
+                    if (currentTolerance <= tolerance)
                     {
                         currentTolerance++;
                         frames++;
-                        if (!movementStartedDistance)
+                       /* if (!movementStartedDistance)
                         {
                             startReactionTimeDistance = reactionTimeDistance;
                             movementStartedDistance = true;
-                        }
+                        }*/
                     }
-                    else if (currentTolerance >= tolerance)
+                    else if (currentTolerance > tolerance)
                     {
                         frames = 0;
                         movementStartedDistance = false;
