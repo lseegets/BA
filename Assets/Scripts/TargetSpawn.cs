@@ -26,7 +26,7 @@ public class TargetSpawn : MonoBehaviour
     private const float radiusTargetSafeSpace = 2f;
     private const float startElevation = 0.25f * Mathf.PI;
     private const float startPolar = 0.5f * Mathf.PI;
-    private const int testRunTargetCount = 10;
+    private const int testRunTargetCount = 20;
     private const int seriousTargetCount = 51;
 
     private GameObject currentTarget;
@@ -37,12 +37,11 @@ public class TargetSpawn : MonoBehaviour
     private Plotter plotter;
     private ViveTracker viveTracker;
     private LaserInput laserInput;
+    private WeightManager.WeightLevel weightLevel;
 
     private int currentTargetCount = 0;
     private int maxTargetCount;
     private float totalTime = 0;
-
-    private WeightManager.WeightLevel weightLevel;
 
     // Start is called before the first frame update
     void Start()
@@ -76,15 +75,14 @@ public class TargetSpawn : MonoBehaviour
     public void OnTargetDestroyed()
     {
         currentTargetCount++;
-        PlayerData playerData = new PlayerData(playerId, currentTargetCount, weightLevel, Timer.timer, laserInput.maxSpeed);
+        PlayerData playerData = new PlayerData(playerId, currentTargetCount, weightLevel, Timer.timer);
         totalTime += Timer.timer;
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount);
         plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.trackerDistanceToHmd, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
-        plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), laserInput.startReactionTime, laserInput.startReactionTimeDistance, laserInput.trackingData2, laserInput.rayDistanceToPrevPos2, laserInput.rayPos2, laserInput.rayDistanceToLastTarget2, laserInput.rayDistanceToCurrentTarget2, laserInput.vectorX, laserInput.vectorY, laserInput.vectorZ);
+        plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), laserInput.reactionTime, laserInput.startReactionTimeDistance, laserInput.vectorX, laserInput.vectorY, laserInput.vectorZ);
         ClearTrackingData();
         laserInput.totalDistance = 0;
-        laserInput.totalDistance2 = 0;
         viveTracker.totalDistance = 0;
         csvWriter.WriteCSV(playerData);
         SendPositionData();
@@ -179,21 +177,13 @@ public class TargetSpawn : MonoBehaviour
         laserInput.vectorY.Clear();
         laserInput.vectorZ.Clear();
         laserInput.reactionTime = 0;
-        laserInput.startReactionTime = 0;
         laserInput.startReactionTimeDistance = 0;
         laserInput.reactionTimeDistance = 0;
         laserInput.trackedReactionTime = false;
         laserInput.trackedReactionTimeDistance = false;
         laserInput.movementStarted = false;
         laserInput.movementStartedDistance = false;
-        laserInput.maxSpeed = 0;
         laserInput.frames = 0;
-
-        laserInput.trackingData2.Clear();
-        laserInput.rayPos2.Clear();
-        laserInput.rayDistanceToPrevPos2.Clear();
-        laserInput.rayDistanceToLastTarget2.Clear();
-        laserInput.rayDistanceToCurrentTarget2.Clear();
     }
 
     private void SpawnFirstTarget()
@@ -228,55 +218,10 @@ public class TargetSpawn : MonoBehaviour
         normal = Vector3.Cross(currentTargetPos - previousTargetPos, cameraPos).normalized;
         plane.SetNormalAndPosition(normal, currentTargetPos);
         SendPlaneData(plane);
-       // OnDrawGizmos();
     }
 
     public void SendPlaneData(Plane plane)
     {
         laserInput.GetPlaneData(plane);
     }
-
-    /*void OnDrawGizmos()
-    {
-        //plane = new Plane(normal, currentTargetPos);
-
-        // Draw our three input points in world space.
-        // b and c are drawn as lollipops from the preceding point,
-        // so that you can see the clockwise winding direction.
-
-        Gizmos.color = Color.white;
-        Gizmos.DrawWireSphere(currentTargetPos, 0.1f);
-
-        Gizmos.color = Color.gray;
-        Gizmos.DrawLine(currentTargetPos, previousTargetPos);
-        Gizmos.DrawWireSphere(previousTargetPos, 0.1f);
-
-        Gizmos.color = Color.black;
-        Gizmos.DrawLine(previousTargetPos, normal);
-        Gizmos.DrawWireSphere(normal, 0.1f);
-
-        // Draw this object's position, 
-        // as a lollipop sticking out from our plane,
-        // blue-green if in front (in the positive half-space),
-        // and red if behind (negative half-space).           
-        Gizmos.color = plane.GetSide(transform.position) ? Color.cyan : Color.red;
-        Gizmos.DrawLine(plane.ClosestPointOnPlane(transform.position), transform.position);
-        Gizmos.DrawWireSphere(transform.position, 0.2f);
-
-        // Draw plane normal.
-        Gizmos.color = Color.yellow;
-        var center = (currentTargetPos + previousTargetPos + normal) / 3f;
-        Gizmos.DrawLine(center, center + plane.normal);
-
-        // Draw planar grid.
-        Gizmos.color = Color.blue;
-        var matrix = Gizmos.matrix;
-        Gizmos.matrix = Matrix4x4.TRS(center, Quaternion.LookRotation(plane.normal), Vector3.one);
-        for (int i = -10; i <= 10; i++)
-        {
-            Gizmos.DrawLine(new Vector3(i, -10, 0), new Vector3(i, 10, 0));
-            Gizmos.DrawLine(new Vector3(-10, i, 0), new Vector3(10, i, 0));
-        }
-        Gizmos.matrix = matrix;
-    }*/
 }

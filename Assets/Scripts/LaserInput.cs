@@ -5,75 +5,51 @@ using UnityEngine;
 
 public class LaserInput : MonoBehaviour
 {
-    [SerializeField] GameObject cube;
     [SerializeField] public Material activatedMaterial;
     [SerializeField] Material defaultMaterial;
 
     public static GameObject currentObject;
     public List<KeyValuePair<float, decimal>> trackingData = new();
     public List<string> cameraPos = new();
-
     public List<float> vectorX = new();
     public List<float> vectorY = new();
     public List<float> vectorZ = new();
-
     public List<string> rayPos = new();
     public List<decimal> rayDistanceToLastTarget = new();
     public List<float> rayDistanceToCurrentTarget = new();
     public List<decimal> rayDistanceToPrevPos = new();
+
     public decimal totalDistance = 0;
-    public decimal totalDistance2 = 0;
 
     public float reactionTime = 0;
     public float reactionTimeDistance = 0;
-
-    // public Material activatedMaterial;
-    // public Material defaultMaterial;
-
-    private const float DestructionTime = 0.2f;
-
-    private float countdown;
-    private Plane plane;
-    private Vector3 currentRayPos;
-    private Vector2 currentRayPos2;
-    private Vector3 lastRayPos;
-    private Vector2 lastRayPos2;
-    private Vector3 currentTargetPos;
-    private Vector2 currentTargetPos2;
-    private Vector3 previousTargetPos;    
-    private Vector2 previousTargetPos2;    
-
-    private decimal prevRayDistance;
-    private decimal prevRayDistance2;
-    private decimal currentRayDistance;
-    private decimal currentRayDistance2;
-    private float rayDistanceToCurrTarget;
-    private float rayDistanceToCurrTarget2;
-    private bool goingForward;
-    private bool goingForward2;
-
-    private float maxReactionTime = 0.6f;
-    private float currentReactionTime = 0;
     public float startReactionTime = 0;
     public float startReactionTimeDistance = 0;
-    private float maxReactionSpeed = 0.6f;
-
-    public List<KeyValuePair<float, decimal>> trackingData2 = new();
-    public List<string> rayPos2 = new();
-    public List<decimal> rayDistanceToPrevPos2 = new();
-    public List<decimal> rayDistanceToLastTarget2 = new();
-    public List<float> rayDistanceToCurrentTarget2 = new();
-
     public bool trackedReactionTime = false;
     public bool movementStarted = false;
     public bool movementStartedDistance = false;
     public bool trackedReactionTimeDistance = false;
-    public float maxSpeed = 0;
     public int frames = 0;
-    private int maxFrames = 20;
-    private decimal distanceThreshold = 0.01m; //try 0.01 again
-    private int tolerance = 2;
+
+    private const float DestructionTime = 0.2f;
+    private const float maxReactionDistance = 0.04f;
+    private const int maxFrames = 20;
+    private const int tolerance = 2;
+    private const decimal distanceThreshold = 0.01m;
+
+    private Plane plane;
+    private Vector3 currentRayPos;
+    private Vector3 lastRayPos;
+    private Vector3 currentTargetPos;
+    private Vector3 previousTargetPos;
+    private Vector3 reactionStartPos;
+
+    private decimal prevRayDistance;
+    private decimal currentRayDistance;
+    private float countdown;
+    private float rayDistanceToCurrTarget;
     private int currentTolerance = 0;
+    private bool goingForward;
 
     // Start is called before the first frame update
     void Start()
@@ -81,19 +57,16 @@ public class LaserInput : MonoBehaviour
         currentObject = null;
         countdown = DestructionTime;
 
-        lastRayPos = new Vector3(0, 0, 0);
-        lastRayPos2 = new Vector2(0, 0);
+        lastRayPos = new Vector3(-0.000000155f, 3.535534000f, 3.535534000f);
 
         prevRayDistance = (decimal)Vector3.Distance(previousTargetPos, lastRayPos);
-        prevRayDistance2 = (decimal)Vector2.Distance(previousTargetPos2, lastRayPos2);
 
         rayDistanceToCurrTarget = Vector3.Distance(currentTargetPos, lastRayPos);
-        rayDistanceToCurrTarget2 = Vector2.Distance(currentTargetPos2, lastRayPos2);
     }
 
     void FixedUpdate()
     {
-       // if (!trackedReactionTime) reactionTime += Time.deltaTime;
+        if (!trackedReactionTime) reactionTime += Time.deltaTime;
         if (!trackedReactionTimeDistance) reactionTimeDistance += Time.deltaTime;
 
         Ray ray = new Ray(transform.position, transform.forward);
@@ -103,16 +76,17 @@ public class LaserInput : MonoBehaviour
             if (plane.Raycast(ray, out enter))
             {
                 Vector3 hitPoint = ray.GetPoint(enter);
-                Vector2 hitPoint2 = ray.GetPoint(enter);
                 currentRayPos = hitPoint;
-                currentRayPos2 = hitPoint2;
+                if (!movementStarted)
+                {
+                    reactionStartPos = hitPoint;
+                    movementStarted = true;
+                }
                 CheckDistanceToTargets();
                 CalculateDistance();
-                // cube.transform.position = hitPoint;
               //  CalculateReactionTime();
                 
                 lastRayPos = currentRayPos;
-                lastRayPos2 = currentRayPos2;
             }
             if (hit.collider.gameObject.CompareTag("Target"))
             {
@@ -142,35 +116,15 @@ public class LaserInput : MonoBehaviour
     {
         currentTargetPos = currentTarget;
         previousTargetPos = previousTarget;
-
-        currentTargetPos2 = currentTarget;
-        previousTargetPos2 = previousTarget;
     }
 
     private void CalculateReactionTime()
     {
         if (!trackedReactionTime)
         {
-            float speed = Vector3.Distance(lastRayPos, currentRayPos) / Time.deltaTime;
-            if (speed >= maxReactionSpeed)
+            if ((Vector3.Distance(reactionStartPos, currentTargetPos) - Vector3.Distance(currentRayPos, currentTargetPos) >= maxReactionDistance))
             {
-                if (!movementStarted)
-                {
-                    startReactionTime = reactionTime;
-                    movementStarted = true;
-                }
-                currentReactionTime += Time.deltaTime;
-                if (currentReactionTime >= maxReactionTime)
-                {
-                    trackedReactionTime = true;
-                    //reactionTime = startReactionTime;
-                }
-            }
-            else
-            {
-                currentReactionTime = 0;
-                startReactionTime = 0;
-                movementStarted = false;
+                trackedReactionTime = true;
             }
         }
 
@@ -193,11 +147,6 @@ public class LaserInput : MonoBehaviour
                     {
                         currentTolerance++;
                         frames++;
-                       /* if (!movementStartedDistance)
-                        {
-                            startReactionTimeDistance = reactionTimeDistance;
-                            movementStartedDistance = true;
-                        }*/
                     }
                     else if (currentTolerance > tolerance)
                     {
@@ -214,13 +163,11 @@ public class LaserInput : MonoBehaviour
                 currentTolerance = 0;
             }
         }
-
     }
 
     private void CheckDistanceToTargets()
     {
         currentRayDistance = (decimal)Vector3.Distance(previousTargetPos, currentRayPos);
-        currentRayDistance2 = (decimal)Vector2.Distance(previousTargetPos2, currentRayPos2);
 
         if (prevRayDistance <= currentRayDistance)
         {
@@ -232,25 +179,16 @@ public class LaserInput : MonoBehaviour
             goingForward = false;
         }
 
-        if (prevRayDistance2 <= currentRayDistance2)
-        {
-            goingForward2 = true;
-        }
-        else if (prevRayDistance2 > currentRayDistance2)
-        {
-            goingForward2 = false;
-        }
-
         prevRayDistance = currentRayDistance;
-        prevRayDistance2 = currentRayDistance2;
         rayDistanceToCurrTarget = Vector3.Distance(currentTargetPos, currentRayPos);
-        rayDistanceToCurrTarget2 = Vector2.Distance(currentTargetPos2, currentRayPos2);
     }
 
     private void CalculateDistance()
     {
         decimal distance = (decimal)Vector3.Distance(currentRayPos, lastRayPos);
-        decimal distance2 = (decimal)Vector2.Distance(currentRayPos2, lastRayPos2);
+        Debug.Log(distance);
+        Debug.Log(currentRayPos);
+        Debug.Log(lastRayPos);
 
         if (goingForward)
         {
@@ -262,27 +200,12 @@ public class LaserInput : MonoBehaviour
             totalDistance -= distance;
         }
 
-        if (goingForward2)
-        {
-            totalDistance2 += distance2;
-        }
-        else if (!goingForward2)
-        {
-            totalDistance2 -= distance2;
-        }
-
         trackingData.Add(new KeyValuePair<float, decimal>(Timer.timer, totalDistance));
         rayPos.Add(currentRayPos.ToString("F9"));
         rayDistanceToPrevPos.Add(distance);
         cameraPos.Add(GameObject.FindGameObjectsWithTag("MainCamera")[0].transform.position.ToString("F9"));
         rayDistanceToLastTarget.Add(prevRayDistance);
         rayDistanceToCurrentTarget.Add(rayDistanceToCurrTarget);
-
-        trackingData2.Add(new KeyValuePair<float, decimal>(Timer.timer, totalDistance2));
-        rayPos2.Add(currentRayPos2.ToString("F9"));
-        rayDistanceToPrevPos2.Add(distance2);
-        rayDistanceToLastTarget2.Add(prevRayDistance2);
-        rayDistanceToCurrentTarget2.Add(rayDistanceToCurrTarget2);
 
         vectorX.Add(currentRayPos.x);
         vectorY.Add(currentRayPos.y);
