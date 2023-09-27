@@ -33,7 +33,7 @@ public class LaserInput : MonoBehaviour
 
     private const float DestructionTime = 0.2f;
     private const float maxReactionDistance = 0.04f;
-    private const int maxFrames = 20;
+    private const int maxFrames = 30; //20
     private const int tolerance = 2;
     private const decimal distanceThreshold = 0.01m;
 
@@ -186,9 +186,6 @@ public class LaserInput : MonoBehaviour
     private void CalculateDistance()
     {
         decimal distance = (decimal)Vector3.Distance(currentRayPos, lastRayPos);
-        Debug.Log(distance);
-        Debug.Log(currentRayPos);
-        Debug.Log(lastRayPos);
 
         if (goingForward)
         {

@@ -8,15 +8,17 @@ public class Plotter : MonoBehaviour
 {
     private int id;
     private int targetCount;
+    private WeightManager.WeightLevel weightLevel;
     private string fileName;
     private string fileNameRay;
 
-    public Plotter(int playerId, int count)
+    public Plotter(int playerId, int count, WeightManager.WeightLevel level)
     {
         id = playerId;
         targetCount = count;
-        fileName = Application.dataPath + "/CSVFiles/Player" + id + "_" + targetCount + "_plot.csv";
-        fileNameRay = Application.dataPath + "/CSVFiles/Player" + id + "_" + targetCount + "_plot_RayData.csv";
+        weightLevel = level;
+        fileName = Application.dataPath + "/CSVFiles/Player" + id + "_" + weightLevel + "_" + targetCount + "_plot.csv";
+        fileNameRay = Application.dataPath + "/CSVFiles/Player" + id + "_" + weightLevel + "_" + targetCount + "_plot_RayData.csv";
         if (!File.Exists(fileName)) WriteHeader();
         if (!File.Exists(fileNameRay)) WriteRayHeader();
     }
