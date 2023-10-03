@@ -22,10 +22,17 @@ public class CSVWriter : MonoBehaviour
         writer.Close();
     }
 
+    public void WriteTotalTime(float totalTime)
+    {
+        TextWriter writer = new StreamWriter(fileName, true);
+        writer.WriteLine(";;;;;" + totalTime);
+        writer.Close();
+    }
+
     private void WriteHeader()
     {
         TextWriter writer = new StreamWriter(fileName, true);
-        writer.WriteLine("id;target number;weight level;time");
+        writer.WriteLine("id;target number;weight level;time;;total time");
         writer.Close();
     }
 }

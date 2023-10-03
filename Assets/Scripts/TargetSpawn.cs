@@ -93,8 +93,12 @@ public class TargetSpawn : MonoBehaviour
             display.text = "";
             SpawnNextTarget();
         }
-        else if (currentTargetCount == maxTargetCount) display.text = "DONE! \n" + "Total Time: " + totalTime.ToString("n2") + " seconds \n\n\n" +
-        "What level of exertion did you experience on a scale of \n\n 6 (no exertion/relaxed) to 20 (maximal exertion)?";
+        else if (currentTargetCount == maxTargetCount)
+        {
+            csvWriter.WriteTotalTime(totalTime);
+            display.text = "DONE! \n" + "Total Time: " + totalTime.ToString("n2") + " seconds \n\n\n" +
+            "What level of exertion did you experience on a scale of \n\n 6 (no exertion/relaxed) to 20 (maximal exertion)?";
+        }
     }
 
     public void SendPositionData()
