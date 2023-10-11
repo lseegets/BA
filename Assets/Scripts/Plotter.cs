@@ -37,10 +37,11 @@ public class Plotter : MonoBehaviour
         writer.Close();
     }
 
-    public void WriteRayCSV(List<KeyValuePair<float, decimal>> dataList, List<decimal> rayDistanceToPrevPos, List<string> rayPos, List<string> cameraPos, List<decimal> rayDistanceToLastTarget, List<float> rayDistanceToCurrentTarget, string previousTarget, string currentTarget, float reactionTime, float reactionTimeDistance, List<float> vectorX, List<float> vectorY, List<float> vectorZ)
+    public void WriteRayCSV(List<KeyValuePair<float, decimal>> dataList, List<decimal> rayDistanceToPrevPos, List<string> rayPos, List<string> cameraPos, List<decimal> rayDistanceToLastTarget, List<float> rayDistanceToCurrentTarget, string previousTarget, string currentTarget, float reactionTime, float reactionTimeDistance, bool isOvershoot, List<float> vectorX, List<float> vectorY, List<float> vectorZ)
     {
         TextWriter writer = new StreamWriter(fileNameRay, true);
         writer.WriteLine(previousTarget + ";" + currentTarget + ";" + reactionTime + ";" + reactionTimeDistance);
+        if (isOvershoot) writer.WriteLine(isOvershoot);
         writer.WriteLine();
 
         for (int i = 0; i < dataList.Count; i++)

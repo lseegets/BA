@@ -80,7 +80,7 @@ public class TargetSpawn : MonoBehaviour
         Timer.StopTimer();
         plotter = new Plotter(playerId, currentTargetCount, weightLevel);
         plotter.WriteCSV(viveTracker.trackingData, viveTracker.distanceToPrevPos, viveTracker.controllerPos, viveTracker.controllerRot, viveTracker.cameraPos, viveTracker.trackerDistanceToHmd, viveTracker.distanceToLastTarget, viveTracker.distanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), viveTracker.vectorX, viveTracker.vectorY, viveTracker.vectorZ);
-        plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), laserInput.reactionTime, laserInput.startReactionTimeDistance, laserInput.vectorX, laserInput.vectorY, laserInput.vectorZ);
+        plotter.WriteRayCSV(laserInput.trackingData, laserInput.rayDistanceToPrevPos, laserInput.rayPos, laserInput.cameraPos, laserInput.rayDistanceToLastTarget, laserInput.rayDistanceToCurrentTarget, previousTargetPos.ToString("F9"), currentTargetPos.ToString("F9"), laserInput.reactionTime, laserInput.startReactionTimeDistance, laserInput.isOvershoot, laserInput.vectorX, laserInput.vectorY, laserInput.vectorZ);
         ClearTrackingData();
         laserInput.totalDistance = 0;
         viveTracker.totalDistance = 0;
@@ -188,6 +188,8 @@ public class TargetSpawn : MonoBehaviour
         laserInput.movementStarted = false;
         laserInput.movementStartedDistance = false;
         laserInput.frames = 0;
+        laserInput.isOvershoot = false;
+        laserInput.timesTouched = 0;
     }
 
     private void SpawnFirstTarget()
