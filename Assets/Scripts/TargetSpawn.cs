@@ -189,7 +189,7 @@ public class TargetSpawn : MonoBehaviour
         laserInput.movementStartedDistance = false;
         laserInput.frames = 0;
         laserInput.isOvershoot = false;
-        laserInput.timesTouched = 0;
+        laserInput.touchedTarget = false;
     }
 
     private void SpawnFirstTarget()

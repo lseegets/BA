@@ -30,8 +30,8 @@ public class LaserInput : MonoBehaviour
     public bool movementStartedDistance = false;
     public bool trackedReactionTimeDistance = false;
     public bool isOvershoot = false;
+    public bool touchedTarget = false;
     public int frames = 0;
-    public int timesTouched = 0;
 
     private const float DestructionTime = 0.2f;
     private const float maxReactionDistance = 0.04f;
@@ -92,8 +92,7 @@ public class LaserInput : MonoBehaviour
             }
             if (hit.collider.gameObject.CompareTag("Target"))
             {
-                timesTouched++;
-                if (timesTouched >= 2) isOvershoot = true;
+                touchedTarget = true;
                 currentObject = hit.collider.gameObject;
                 currentObject.GetComponent<MeshRenderer>().material = activatedMaterial;
                 countdown -= Time.deltaTime;
@@ -107,6 +106,7 @@ public class LaserInput : MonoBehaviour
             {
                 ResetCountdown();
                 if (currentObject != null) currentObject.GetComponent<MeshRenderer>().material = defaultMaterial;
+                if (touchedTarget) isOvershoot = true;
             }
         }
     }
